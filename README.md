@@ -1,16 +1,30 @@
-# React + Vite
+# Life Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Личный веб-планер для отслеживания прогресса в пяти сферах жизни: спорт, привычки, питание/сон, учёба, финансы. Один пользователь, без публичной регистрации. Подробности — [docs/SPEC.md](docs/SPEC.md).
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React + Vite + Tailwind CSS + Supabase (Postgres + Auth) + Chart.js. Хостинг — Vercel (free tier).
 
-## React Compiler
+## Локальная разработка
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build
+npm test
+npm run lint
+```
 
-## Expanding the Oxlint configuration
+Нужен файл `.env.local` (см. `.env.example`) с ключами твоего Supabase-проекта.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Настройка Supabase (один раз)
+
+1. Создай проект на [supabase.com](https://supabase.com).
+2. Выполни `supabase/schema.sql` в SQL Editor.
+3. Создай единственного пользователя вручную: Authentication → Users → Add user.
+4. Скопируй Project URL и Publishable (anon) key из Project Settings → API в `.env.local`.
+
+## Деплой
+
+Импортируй репозиторий в [Vercel](https://vercel.com), добавь переменные окружения `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY` в настройках проекта, задеплой. `vercel.json` уже настроен под client-side роутинг (react-router).
