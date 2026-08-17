@@ -121,10 +121,10 @@ export default function Finance() {
       <Card title="Транзакции">
         <div className="flex flex-col divide-y divide-neutral-800">
           {transactions.map((t) => (
-            <div key={t.id} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-neutral-500">{t.date}</span>
-              <span className="flex-1 px-3">{t.category}</span>
-              <span className={t.type === 'income' ? 'text-emerald-400' : 'text-red-400'}>
+            <div key={t.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <span className="shrink-0 text-neutral-500">{t.date}</span>
+              <span className="min-w-0 flex-1 truncate px-1">{t.category}</span>
+              <span className={`shrink-0 ${t.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
                 {t.type === 'income' ? '+' : '-'}
                 {t.amount}
               </span>

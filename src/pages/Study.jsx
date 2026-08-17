@@ -147,10 +147,10 @@ export default function Study() {
       <Card title="История сессий">
         <div className="flex flex-col divide-y divide-neutral-800">
           {sessions.map((s) => (
-            <div key={s.id} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-neutral-500">{s.date}</span>
-              <span className="flex-1 px-3">{s.subject}</span>
-              <span className="text-neutral-400">{s.duration_min} мин</span>
+            <div key={s.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <span className="shrink-0 text-neutral-500">{s.date}</span>
+              <span className="min-w-0 flex-1 truncate px-1">{s.subject}</span>
+              <span className="shrink-0 text-neutral-400">{s.duration_min} мин</span>
             </div>
           ))}
           {sessions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет сессий</p>}
