@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { habitStreak, sumByWeek, goalProgress } from './calculations.js'
+import { habitStreak, sumByWeek, goalProgress, sumByCategory } from './calculations.js'
 
 describe('habitStreak', () => {
   it('returns 0 for no logs', () => {
@@ -77,5 +77,32 @@ describe('goalProgress', () => {
 
   it('returns 0 when the target is 0 (avoids division by zero)', () => {
     expect(goalProgress(5, 0)).toBe(0)
+  })
+})
+
+describe('sumByCategory', () => {
+  it('returns an empty array for no entries', () => {
+    expect(sumByCategory([])).toEqual([])
+  })
+
+  it('sums multiple entries in the same category', () => {
+    const entries = [
+      { category: 'Еда', amount: 20 },
+      { category: 'Еда', amount: 15 },
+    ]
+    expect(sumByCategory(entries)).toEqual([{ category: 'Еда', total: 35 }])
+  })
+
+  it('sorts categories by total descending', () => {
+    const entries = [
+      { category: 'Транспорт', amount: 10 },
+      { category: 'Еда', amount: 40 },
+      { category: 'Развлечения', amount: 25 },
+    ]
+    expect(sumByCategory(entries)).toEqual([
+      { category: 'Еда', total: 40 },
+      { category: 'Развлечения', total: 25 },
+      { category: 'Транспорт', total: 10 },
+    ])
   })
 })

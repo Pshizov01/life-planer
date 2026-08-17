@@ -34,3 +34,15 @@ export function goalProgress(progress, target) {
   if (!target) return 0
   return Math.min(100, Math.round((progress / target) * 100))
 }
+
+// entries: [{ category: string, amount: number }, ...]
+// возвращает [{ category, total }] по убыванию суммы
+export function sumByCategory(entries) {
+  const totals = new Map()
+  for (const entry of entries) {
+    totals.set(entry.category, (totals.get(entry.category) ?? 0) + entry.amount)
+  }
+  return [...totals.entries()]
+    .sort(([, a], [, b]) => b - a)
+    .map(([category, total]) => ({ category, total }))
+}
