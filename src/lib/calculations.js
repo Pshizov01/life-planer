@@ -28,3 +28,9 @@ export function sumByWeek(entries) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([week, total]) => ({ week, total }))
 }
+
+// Возвращает процент прогресса (0-100), не деля на 0
+export function goalProgress(progress, target) {
+  if (!target) return 0
+  return Math.min(100, Math.round((progress / target) * 100))
+}

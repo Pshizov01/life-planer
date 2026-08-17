@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { habitStreak, sumByWeek } from './calculations.js'
+import { habitStreak, sumByWeek, goalProgress } from './calculations.js'
 
 describe('habitStreak', () => {
   it('returns 0 for no logs', () => {
@@ -59,5 +59,23 @@ describe('sumByWeek', () => {
       { week: '2026-08-10', total: 30 },
       { week: '2026-08-17', total: 15 },
     ])
+  })
+})
+
+describe('goalProgress', () => {
+  it('returns 0 for no progress', () => {
+    expect(goalProgress(0, 10)).toBe(0)
+  })
+
+  it('returns the percentage of progress toward the target', () => {
+    expect(goalProgress(5, 10)).toBe(50)
+  })
+
+  it('caps at 100 when progress exceeds the target', () => {
+    expect(goalProgress(15, 10)).toBe(100)
+  })
+
+  it('returns 0 when the target is 0 (avoids division by zero)', () => {
+    expect(goalProgress(5, 0)).toBe(0)
   })
 })

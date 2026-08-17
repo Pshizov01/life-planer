@@ -1,5 +1,7 @@
+import { goalProgress } from '../lib/calculations'
+
 export function ProgressBar({ value, max }) {
-  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0
+  const pct = goalProgress(value, max)
   return (
     <div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-800">
