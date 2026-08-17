@@ -1,0 +1,29 @@
+import { useCallback, useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
+
+export function useDailyLog() {
+  const [logs, setLogs] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const reload = useCallback(async () => {
+    const { data } = await supabase.from('daily_log').select('*').order('date', { ascending: true })
+    setLogs(data ?? [])
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    reload()
+  }, [reload])
+
+  async function saveDay(entry) {
+    const existing = logs.find((l) => l.date === entry.date)
+    if (existing) {
+      await supabase.from('daily_log').update(entry).eq('id', existing.id)
+    } else {
+      await supabase.from('daily_log').insert(entry)
+    }
+    await reload()
+  }
+
+  return { logs, loading, saveDay }
+}
