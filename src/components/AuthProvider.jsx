@@ -3,10 +3,11 @@ import { supabase } from '../lib/supabaseClient'
 import { AuthContext } from '../lib/AuthContext'
 
 // Внутри Telegram Web App пробует войти автоматически по подписанным данным
-// Telegram — без формы. Возвращает true, если сессию удалось установить.
+// Telegram — без формы. Возвращает причину неудачи (или null при успехе),
+// чтобы её можно было показать на экране логина для диагностики.
 async function tryTelegramAutoLogin() {
   const initData = window.Telegram?.WebApp?.initData
-  if (!initData) return false
+  if (!initData) return 'no-init-data'
 
   try {
     const response = await fetch('/api/telegram-auth', {
@@ -14,18 +15,22 @@ async function tryTelegramAutoLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ initData }),
     })
-    if (!response.ok) return false
+    if (!response.ok) {
+      const body = await response.text()
+      return `api-${response.status}: ${body.slice(0, 200)}`
+    }
 
     const { access_token, refresh_token } = await response.json()
     const { error } = await supabase.auth.setSession({ access_token, refresh_token })
-    return !error
-  } catch {
-    return false
+    return error ? `set-session: ${error.message}` : null
+  } catch (err) {
+    return `network: ${err.message}`
   }
 }
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(undefined)
+  const [telegramAuthDebug, setTelegramAuthDebug] = useState(null)
 
   useEffect(() => {
     async function init() {
@@ -35,11 +40,12 @@ export function AuthProvider({ children }) {
         return
       }
 
-      const loggedInViaTelegram = await tryTelegramAutoLogin()
-      if (!loggedInViaTelegram) {
+      const failureReason = await tryTelegramAutoLogin()
+      if (failureReason) {
+        setTelegramAuthDebug(failureReason)
         setSession(null)
       }
-      // При успехе onAuthStateChange ниже сам выставит session.
+      // При успехе (failureReason === null) onAuthStateChange ниже сам выставит session.
     }
 
     init()
@@ -52,7 +58,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ session, loading: session === undefined }}>
+    <AuthContext.Provider value={{ session, loading: session === undefined, telegramAuthDebug }}>
       {children}
     </AuthContext.Provider>
   )

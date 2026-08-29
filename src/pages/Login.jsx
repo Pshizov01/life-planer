@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../hooks/useAuth'
 
 export default function Login() {
+  const { telegramAuthDebug } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
@@ -27,6 +29,11 @@ export default function Login() {
   return (
     <div className="mx-auto mt-24 max-w-sm px-4">
       <h1 className="mb-6 text-2xl font-semibold">Вход</h1>
+      {telegramAuthDebug && (
+        <p className="mb-3 break-words rounded-lg bg-amber-50 p-2 text-xs text-amber-700">
+          Telegram auto-login failed: {telegramAuthDebug}
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           type="email"
