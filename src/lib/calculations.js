@@ -8,7 +8,7 @@ export function habitStreak(logs) {
   return streak
 }
 
-function mondayOf(dateStr) {
+export function mondayOf(dateStr) {
   const d = new Date(`${dateStr}T00:00:00`)
   const day = d.getDay()
   const offset = day === 0 ? -6 : 1 - day

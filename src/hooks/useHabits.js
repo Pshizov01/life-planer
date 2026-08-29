@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { mondayOf } from '../lib/calculations'
 
-const GRID_DAYS = 14
-
-function lastNDates(n) {
+// Текущая календарная неделя, Пн -> Вс (по возрастанию). Пересчитывается
+// каждый рендер от реальной даты, поэтому в понедельник сама сдвигается
+// на следующую неделю — без отдельного планировщика.
+function currentWeekDates() {
+  const monday = mondayOf(new Date().toLocaleDateString('en-CA'))
+  const d = new Date(`${monday}T00:00:00`)
   const dates = []
-  const today = new Date()
-  for (let i = 0; i < n; i++) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
+  for (let i = 0; i < 7; i++) {
     dates.push(d.toLocaleDateString('en-CA'))
+    d.setDate(d.getDate() + 1)
   }
   return dates
 }
@@ -18,8 +20,8 @@ export function useHabits() {
   const [habits, setHabits] = useState([])
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
-  const dates = lastNDates(GRID_DAYS)
-  const fromDate = dates[dates.length - 1]
+  const dates = currentWeekDates()
+  const fromDate = dates[0]
 
   const reload = useCallback(async () => {
     const [{ data: habitsData }, { data: logsData }] = await Promise.all([

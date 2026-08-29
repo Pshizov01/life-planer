@@ -4,6 +4,7 @@ import { useDailyLog } from '../hooks/useDailyLog'
 import { useStudy } from '../hooks/useStudy'
 import { useFinance } from '../hooks/useFinance'
 import { goalProgress } from '../lib/calculations'
+import { PRAYER_NAMES } from '../lib/constants'
 import { Card } from '../components/Card'
 
 function daysAgo(n) {
@@ -13,7 +14,7 @@ function daysAgo(n) {
 }
 
 export default function Dashboard() {
-  const { habits, logs: habitLogs, loading: habitsLoading } = useHabits()
+  const { habits, logs: habitLogs, dates: weekDates, loading: habitsLoading } = useHabits()
   const { workouts, loading: workoutsLoading } = useWorkouts()
   const { logs: dailyLogs, loading: dailyLoading } = useDailyLog()
   const { goals: studyGoals, loading: studyLoading } = useStudy()
@@ -27,7 +28,19 @@ export default function Dashboard() {
   const weekWorkouts = workouts.filter((w) => w.date >= last7)
   const weekWorkoutsMinutes = weekWorkouts.reduce((sum, w) => sum + w.duration_min, 0)
 
-  const habitsDonePct = goalProgress(habitLogs.filter((l) => l.date >= last7).length, habits.length * 7)
+  const prayers = habits.filter((h) => PRAYER_NAMES.includes(h.name))
+  const prayerIds = new Set(prayers.map((h) => h.id))
+  const prayerDonePct = goalProgress(
+    habitLogs.filter((l) => prayerIds.has(l.habit_id)).length,
+    prayers.length * weekDates.length,
+  )
+
+  const personalHabits = habits.filter((h) => !PRAYER_NAMES.includes(h.name))
+  const personalIds = new Set(personalHabits.map((h) => h.id))
+  const habitsDonePct = goalProgress(
+    habitLogs.filter((l) => personalIds.has(l.habit_id)).length,
+    personalHabits.length * weekDates.length,
+  )
 
   const lastDaily = dailyLogs[dailyLogs.length - 1]
 
@@ -45,14 +58,19 @@ export default function Dashboard() {
       <h1 className="text-2xl font-semibold">Обзор</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card title="Намаз">
+          <p className="text-2xl font-semibold">{prayers.length > 0 ? `${prayerDonePct}%` : '—'}</p>
+          <p className="text-xs text-neutral-500">выполнено на этой неделе</p>
+        </Card>
+
         <Card title="Спорт">
           <p className="text-2xl font-semibold">{weekWorkouts.length}</p>
           <p className="text-xs text-neutral-500">тренировок за 7 дней ({weekWorkoutsMinutes} мин)</p>
         </Card>
 
         <Card title="Привычки">
-          <p className="text-2xl font-semibold">{habits.length > 0 ? `${habitsDonePct}%` : '—'}</p>
-          <p className="text-xs text-neutral-500">выполнено за 7 дней</p>
+          <p className="text-2xl font-semibold">{personalHabits.length > 0 ? `${habitsDonePct}%` : '—'}</p>
+          <p className="text-xs text-neutral-500">выполнено на этой неделе</p>
         </Card>
 
         <Card title="Питание / Сон">
