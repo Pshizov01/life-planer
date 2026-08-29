@@ -2,14 +2,16 @@
 
 ## Objective
 
-Личный веб-планер для одного пользователя (владельца) для отслеживания прогресса в пяти сферах жизни: спорт, учёба, привычки (включая намазы), питание+сон, финансы. Пользователь вносит записи вручную и видит динамику на графиках. Данные хранятся между сессиями и синхронизируются между устройствами (телефон + компьютер). Полностью бесплатный стек, без сложной авторизации (один пользователь, вход по email+password).
+Личный веб-планер для одного пользователя (владельца) для отслеживания прогресса в семи сферах жизни: намаз, спорт, учёба, привычки, питание+сон, финансы, плюс два вспомогательных инструмента — фокус-таймер (Помодоро) и трекер крупных проектов с чек-листами. Пользователь вносит записи вручную и видит динамику на графиках. Данные хранятся между сессиями и синхронизируются между устройствами (телефон + компьютер). Полностью бесплатный стек, без сложной авторизации (один пользователь, вход по email+password).
 
-**Успех:** владелец может за несколько секунд с телефона добавить запись в любую из 5 сфер и увидеть тренд на графике; данные не теряются и видны на любом устройстве после логина.
+**Успех:** владелец может за несколько секунд с телефона добавить запись в любую сферу и увидеть тренд на графике; данные не теряются и видны на любом устройстве после логина.
+
+**История изменений:** изначально было 5 сфер с тёмной темой и намазом внутри «Привычек». После первого прохода реализации пользователь запросил редизайн на светлую тему (вдохновлённую похожим Telegram-мини-приложением, но не копирующую её один в один), вынес намаз в отдельную сферу с недельным отчётом (Пн-Вс вместо скользящих 14 дней), и добавил Фокус-таймер и Проекты.
 
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite (JavaScript, без TypeScript)
-- **Styling:** Tailwind CSS, тёмная тема (единственная тема, без переключателя)
+- **Styling:** Tailwind CSS, светлая тема (единственная тема, без переключателя)
 - **Routing:** react-router-dom
 - **Backend/DB:** Supabase (Postgres + Auth), free tier
 - **Auth:** Supabase email+password, один аккаунт, создан вручную через Supabase Dashboard. Публичная регистрация (signup) отключена в UI.
@@ -32,12 +34,13 @@ Lint:    npm run lint
 ```
 life-planner/
   src/
-    pages/           → Dashboard.jsx, Sport.jsx, Study.jsx, Habits.jsx, Nutrition.jsx, Finance.jsx, Login.jsx
-    components/      → переиспользуемые UI-компоненты (Card, ChartWrapper, EntryForm, ProgressBar, ProtectedRoute)
-    hooks/            → data-хуки на сферу (useWorkouts, useStudy, useHabits, useDailyLog, useFinance)
+    pages/           → Dashboard.jsx, Prayers.jsx, Sport.jsx, Study.jsx, Habits.jsx, Nutrition.jsx, Finance.jsx, Focus.jsx, Projects.jsx, Login.jsx
+    components/      → переиспользуемые UI-компоненты (Card, ChartWrapper, ProgressBar, ProtectedRoute, AuthProvider)
+    hooks/            → data-хуки на сферу (useWorkouts, useStudy, useHabits, useDailyLog, useFinance, useFocusSessions, useProjects)
     lib/
       supabaseClient.js → инициализация Supabase-клиента
-      calculations.js   → чистые функции: прогресс целей, стрики привычек, агрегации для графиков
+      constants.js      → PRAYER_NAMES (список имён намазов, разделяет Habits/Prayers на одних и тех же таблицах)
+      calculations.js   → чистые функции: прогресс целей, стрики привычек, агрегации для графиков (по неделям/категориям), mondayOf()
       calculations.test.js → unit-тесты на calculations.js
     App.jsx, main.jsx, index.css
   supabase/
@@ -60,7 +63,8 @@ workouts (id uuid pk, user_id uuid, date date, type text, duration_min int, note
 study_goals (id uuid pk, user_id uuid, title text, target numeric, progress numeric, unit text, done boolean, created_at timestamptz)
 study_sessions (id uuid pk, user_id uuid, date date, subject text, duration_min int, created_at timestamptz)
 
--- Привычки (включая 5 намазов как обычные привычки)
+-- Привычки и намаз (5 намазов и личные привычки — одни и те же таблицы,
+-- разделяются на UI-уровне по lib/constants.js → PRAYER_NAMES)
 habits (id uuid pk, user_id uuid, name text, sort_order int, created_at timestamptz)
 habit_logs (id uuid pk, user_id uuid, habit_id uuid references habits, date date, done boolean, unique(habit_id, date))
 
@@ -70,6 +74,13 @@ daily_log (id uuid pk, user_id uuid, date date unique, weight_kg numeric, meals_
 -- Финансы
 finance_transactions (id uuid pk, user_id uuid, date date, type text check (type in ('income','expense')), category text, amount numeric, note text, created_at timestamptz)
 finance_goals (id uuid pk, user_id uuid, title text, target_amount numeric, current_amount numeric, target_date date, created_at timestamptz)
+
+-- Фокус (Помодоро)
+focus_sessions (id uuid pk, user_id uuid, date date, duration_min int, created_at timestamptz)
+
+-- Проекты
+projects (id uuid pk, user_id uuid, title text, description text, created_at timestamptz)
+project_tasks (id uuid pk, user_id uuid, project_id uuid references projects, title text, done boolean, sort_order int, created_at timestamptz)
 ```
 
 Начальные данные: при первом запуске (seed) создаются 5 привычек-намазов (Фаджр, Зухр, Аср, Магриб, Иша) — через `supabase/schema.sql` или разово вручную.
@@ -77,14 +88,17 @@ finance_goals (id uuid pk, user_id uuid, title text, target_amount numeric, curr
 ## Pages / Navigation
 
 - `/login` — форма email+password (без signup), редирект на `/` после входа
-- `/` (Dashboard) — сводка по всем 5 сферам: последняя активность + мини-показатель по каждой (напр. тренировок за неделю, % выполненных привычек за 7 дней, последний вес, баланс за месяц)
+- `/` (Dashboard) — сводка по всем сферам: тренировок за неделю, % намаза и привычек за текущую неделю, последний вес/сон, прогресс учебных целей, баланс за месяц
+- `/prayers` — 5 намазов: карточки на сегодня (тумблер вкл/выкл) + график % выполнения за текущую неделю
 - `/sport` — форма добавления тренировки + список записей + график длительности во времени
 - `/study` — список целей с прогресс-барами + форма добавления сессии + график времени занятий
-- `/habits` — сетка (привычки × дни), клик по ячейке переключает да/нет
+- `/habits` — сетка (личные привычки × дни текущей недели, Пн-Вс), клик по ячейке переключает да/нет
 - `/nutrition` — форма дневного лога (вес, приёмы пищи, вода, сон, оценка) + графики (вес, сон во времени)
 - `/finance` — форма транзакции + список + разбивка расходов по категориям + цели с прогресс-баром
+- `/focus` — таймер Помодоро (25/5 мин, старт/пауза/сброс), лог завершённых сессий + график по неделям
+- `/projects` — список проектов с описанием, прогресс-баром и чек-листом задач внутри каждого
 
-Все страницы кроме `/login` защищены (redirect на `/login`, если нет сессии).
+Все страницы кроме `/login` защищены (redirect на `/login`, если нет сессии). Даты для намаза и привычек — текущая календарная неделя (Пн-Вс), пересчитывается на лету от реальной даты.
 
 ## Code Style
 
@@ -143,10 +157,10 @@ export function habitStreak(logs) {
 ## Success Criteria
 
 - [ ] Логин по email+password работает, неавторизованный доступ к страницам данных невозможен
-- [ ] Каждая из 5 сфер: есть форма добавления записи, список/сетка записей, и график/визуализация прогресса во времени
+- [ ] Каждая сфера: есть форма/действие добавления записи, список/сетка записей, и график/визуализация прогресса во времени
 - [ ] Данные сохраняются в Supabase и видны после перезахода и с другого устройства/браузера
-- [ ] Dashboard показывает сводку по всем 5 сферам на одной странице
-- [ ] Тёмная тема, адаптивный layout работает на ширине от ~375px (телефон)
+- [ ] Dashboard показывает сводку по всем сферам на одной странице
+- [ ] Светлая тема, адаптивный layout работает на ширине от ~375px (телефон)
 - [ ] `npm run build` проходит без ошибок, `npm test` — все тесты зелёные
 - [ ] Приложение задеплоено на Vercel и доступно по публичному URL бесплатно
 

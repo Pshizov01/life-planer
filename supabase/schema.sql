@@ -89,6 +89,34 @@ create table finance_goals (
   created_at timestamptz not null default now()
 );
 
+-- ==================== Фокус (Pomodoro) ====================
+create table focus_sessions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  date date not null,
+  duration_min int not null check (duration_min > 0),
+  created_at timestamptz not null default now()
+);
+
+-- ==================== Проекты ====================
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  title text not null,
+  description text,
+  created_at timestamptz not null default now()
+);
+
+create table project_tasks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  project_id uuid not null references projects on delete cascade,
+  title text not null,
+  done boolean not null default false,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
 -- ==================== RLS: включаем и ограничиваем доступ владельцем ====================
 alter table workouts enable row level security;
 alter table study_goals enable row level security;
@@ -98,6 +126,9 @@ alter table habit_logs enable row level security;
 alter table daily_log enable row level security;
 alter table finance_transactions enable row level security;
 alter table finance_goals enable row level security;
+alter table focus_sessions enable row level security;
+alter table projects enable row level security;
+alter table project_tasks enable row level security;
 
 do $$
 declare
@@ -105,7 +136,8 @@ declare
 begin
   foreach t in array array[
     'workouts', 'study_goals', 'study_sessions', 'habits',
-    'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals'
+    'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
+    'focus_sessions', 'projects', 'project_tasks'
   ]
   loop
     execute format(

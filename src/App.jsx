@@ -10,6 +10,8 @@ import Habits from './pages/Habits.jsx'
 import Prayers from './pages/Prayers.jsx'
 import Nutrition from './pages/Nutrition.jsx'
 import Finance from './pages/Finance.jsx'
+import Focus from './pages/Focus.jsx'
+import Projects from './pages/Projects.jsx'
 import Login from './pages/Login.jsx'
 
 const navItems = [
@@ -20,6 +22,8 @@ const navItems = [
   { to: '/habits', label: 'Привычки' },
   { to: '/nutrition', label: 'Питание/Сон' },
   { to: '/finance', label: 'Финансы' },
+  { to: '/focus', label: 'Фокус' },
+  { to: '/projects', label: 'Проекты' },
 ]
 
 function Nav() {
@@ -69,6 +73,8 @@ export default function App() {
             <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
             <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
             <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+            <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
           </Routes>
         </main>
       </AuthProvider>
