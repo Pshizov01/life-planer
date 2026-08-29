@@ -52,7 +52,7 @@ export default function Nutrition() {
     })
   }
 
-  if (loading) return <p className="text-neutral-400">Загрузка…</p>
+  if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const weightSeries = logs.filter((l) => l.weight_kg != null)
   const sleepSeries = logs.filter((l) => l.sleep_hours != null)
@@ -86,7 +86,7 @@ export default function Nutrition() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-neutral-500">
@@ -96,7 +96,7 @@ export default function Nutrition() {
               step="0.1"
               value={form.weight_kg}
               onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
-              className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-neutral-500">
@@ -106,7 +106,7 @@ export default function Nutrition() {
               min="0"
               value={form.meals_count}
               onChange={(e) => setForm({ ...form, meals_count: e.target.value })}
-              className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-neutral-500">
@@ -116,7 +116,7 @@ export default function Nutrition() {
               min="0"
               value={form.water_glasses}
               onChange={(e) => setForm({ ...form, water_glasses: e.target.value })}
-              className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-neutral-500">
@@ -127,7 +127,7 @@ export default function Nutrition() {
               min="0"
               value={form.sleep_hours}
               onChange={(e) => setForm({ ...form, sleep_hours: e.target.value })}
-              className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-neutral-500">
@@ -138,7 +138,7 @@ export default function Nutrition() {
               max="5"
               value={form.plan_score}
               onChange={(e) => setForm({ ...form, plan_score: e.target.value })}
-              className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
             />
           </label>
           <button
@@ -148,7 +148,7 @@ export default function Nutrition() {
             Сохранить
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         <p className="mt-2 text-xs text-neutral-600">
           Выбери дату — если запись за этот день уже есть, поля заполнятся автоматически, и сохранение обновит её.
         </p>

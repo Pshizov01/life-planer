@@ -27,7 +27,7 @@ export default function Sport() {
     setForm({ ...emptyForm, date: form.date })
   }
 
-  if (loading) return <p className="text-neutral-400">Загрузка…</p>
+  if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const weekly = sumByWeek(workouts.map((w) => ({ date: w.date, value: w.duration_min })))
 
@@ -54,13 +54,13 @@ export default function Sport() {
             type="date"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
-            className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value })}
             placeholder="Тип (например, силовая)"
-            className="flex-1 min-w-[160px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[160px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="number"
@@ -68,13 +68,13 @@ export default function Sport() {
             value={form.duration_min}
             onChange={(e) => setForm({ ...form, duration_min: e.target.value })}
             placeholder="Мин"
-            className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
             placeholder="Заметка (необязательно)"
-            className="flex-1 min-w-[160px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[160px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <button
             type="submit"
@@ -83,16 +83,16 @@ export default function Sport() {
             Добавить
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </Card>
 
       <Card title="История">
-        <div className="flex flex-col divide-y divide-neutral-800">
+        <div className="flex flex-col divide-y divide-neutral-200">
           {workouts.map((w) => (
             <div key={w.id} className="flex items-center justify-between gap-2 py-2 text-sm">
               <span className="shrink-0 text-neutral-500">{w.date}</span>
               <span className="min-w-0 flex-1 truncate px-1">{w.type}</span>
-              <span className="shrink-0 text-neutral-400">{w.duration_min} мин</span>
+              <span className="shrink-0 text-neutral-500">{w.duration_min} мин</span>
               {w.note && <span className="max-w-[30%] shrink truncate text-neutral-500">{w.note}</span>}
             </div>
           ))}

@@ -40,7 +40,7 @@ export default function Study() {
     setSessionForm({ ...emptySession, date: sessionForm.date })
   }
 
-  if (loading) return <p className="text-neutral-400">Загрузка…</p>
+  if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const weekly = sumByWeek(sessions.map((s) => ({ date: s.date, value: s.duration_min })))
 
@@ -62,11 +62,11 @@ export default function Study() {
                   placeholder="Новый прогресс"
                   value={progressDrafts[goal.id] ?? ''}
                   onChange={(e) => setProgressDrafts({ ...progressDrafts, [goal.id]: e.target.value })}
-                  className="w-32 rounded-lg border border-neutral-800 bg-neutral-900 px-2 py-1 text-xs outline-none focus:border-emerald-600"
+                  className="w-32 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs outline-none focus:border-emerald-600"
                 />
                 <button
                   onClick={() => handleUpdateProgress(goal.id)}
-                  className="rounded-lg bg-neutral-800 px-2 py-1 text-xs text-neutral-300 hover:bg-neutral-700"
+                  className="rounded-lg bg-neutral-100 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-200"
                 >
                   Обновить
                 </button>
@@ -76,25 +76,25 @@ export default function Study() {
           {goals.length === 0 && <p className="text-sm text-neutral-500">Пока нет целей</p>}
         </div>
 
-        <form onSubmit={handleAddGoal} className="mt-4 flex flex-wrap gap-2 border-t border-neutral-800 pt-4">
+        <form onSubmit={handleAddGoal} className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
           <input
             value={goalForm.title}
             onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
             placeholder="Название цели"
-            className="flex-1 min-w-[160px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[160px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="number"
             value={goalForm.target}
             onChange={(e) => setGoalForm({ ...goalForm, target: e.target.value })}
             placeholder="Цель (число)"
-            className="w-32 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-32 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={goalForm.unit}
             onChange={(e) => setGoalForm({ ...goalForm, unit: e.target.value })}
             placeholder="Ед. измерения"
-            className="w-32 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-32 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <button
             type="submit"
@@ -119,13 +119,13 @@ export default function Study() {
             type="date"
             value={sessionForm.date}
             onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })}
-            className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={sessionForm.subject}
             onChange={(e) => setSessionForm({ ...sessionForm, subject: e.target.value })}
             placeholder="Предмет"
-            className="flex-1 min-w-[160px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[160px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="number"
@@ -133,7 +133,7 @@ export default function Study() {
             value={sessionForm.duration_min}
             onChange={(e) => setSessionForm({ ...sessionForm, duration_min: e.target.value })}
             placeholder="Мин"
-            className="w-24 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-24 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <button
             type="submit"
@@ -145,12 +145,12 @@ export default function Study() {
       </Card>
 
       <Card title="История сессий">
-        <div className="flex flex-col divide-y divide-neutral-800">
+        <div className="flex flex-col divide-y divide-neutral-200">
           {sessions.map((s) => (
             <div key={s.id} className="flex items-center justify-between gap-2 py-2 text-sm">
               <span className="shrink-0 text-neutral-500">{s.date}</span>
               <span className="min-w-0 flex-1 truncate px-1">{s.subject}</span>
-              <span className="shrink-0 text-neutral-400">{s.duration_min} мин</span>
+              <span className="shrink-0 text-neutral-500">{s.duration_min} мин</span>
             </div>
           ))}
           {sessions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет сессий</p>}

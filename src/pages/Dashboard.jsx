@@ -20,7 +20,7 @@ export default function Dashboard() {
   const { transactions, loading: financeLoading } = useFinance()
 
   const loading = habitsLoading || workoutsLoading || dailyLoading || studyLoading || financeLoading
-  if (loading) return <p className="text-neutral-400">Загрузка…</p>
+  if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const last7 = daysAgo(6)
 
@@ -76,7 +76,7 @@ export default function Dashboard() {
         </Card>
 
         <Card title="Финансы">
-          <p className={`text-2xl font-semibold ${monthBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <p className={`text-2xl font-semibold ${monthBalance >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
             {monthBalance.toLocaleString('ru-RU')}
           </p>
           <p className="text-xs text-neutral-500">баланс за этот месяц</p>

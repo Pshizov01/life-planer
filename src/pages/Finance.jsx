@@ -41,7 +41,7 @@ export default function Finance() {
     setGoalDrafts({ ...goalDrafts, [goalId]: '' })
   }
 
-  if (loading) return <p className="text-neutral-400">Загрузка…</p>
+  if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const income = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
   const expense = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
@@ -55,10 +55,10 @@ export default function Finance() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card title="Доходы">
-          <p className="text-2xl font-semibold text-emerald-400">{income.toLocaleString('ru-RU')}</p>
+          <p className="text-2xl font-semibold text-emerald-600">{income.toLocaleString('ru-RU')}</p>
         </Card>
         <Card title="Расходы">
-          <p className="text-2xl font-semibold text-red-400">{expense.toLocaleString('ru-RU')}</p>
+          <p className="text-2xl font-semibold text-red-600">{expense.toLocaleString('ru-RU')}</p>
         </Card>
         <Card title="Баланс">
           <p className="text-2xl font-semibold">{(income - expense).toLocaleString('ru-RU')}</p>
@@ -78,7 +78,7 @@ export default function Finance() {
           <select
             value={txForm.type}
             onChange={(e) => setTxForm({ ...txForm, type: e.target.value })}
-            className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           >
             <option value="expense">Расход</option>
             <option value="income">Доход</option>
@@ -87,13 +87,13 @@ export default function Finance() {
             type="date"
             value={txForm.date}
             onChange={(e) => setTxForm({ ...txForm, date: e.target.value })}
-            className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={txForm.category}
             onChange={(e) => setTxForm({ ...txForm, category: e.target.value })}
             placeholder="Категория"
-            className="flex-1 min-w-[140px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[140px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="number"
@@ -101,13 +101,13 @@ export default function Finance() {
             value={txForm.amount}
             onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
             placeholder="Сумма"
-            className="w-28 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-28 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             value={txForm.note}
             onChange={(e) => setTxForm({ ...txForm, note: e.target.value })}
             placeholder="Заметка (необязательно)"
-            className="flex-1 min-w-[140px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[140px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <button
             type="submit"
@@ -119,12 +119,12 @@ export default function Finance() {
       </Card>
 
       <Card title="Транзакции">
-        <div className="flex flex-col divide-y divide-neutral-800">
+        <div className="flex flex-col divide-y divide-neutral-200">
           {transactions.map((t) => (
             <div key={t.id} className="flex items-center justify-between gap-2 py-2 text-sm">
               <span className="shrink-0 text-neutral-500">{t.date}</span>
               <span className="min-w-0 flex-1 truncate px-1">{t.category}</span>
-              <span className={`shrink-0 ${t.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+              <span className={`shrink-0 ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
                 {t.type === 'income' ? '+' : '-'}
                 {t.amount}
               </span>
@@ -148,11 +148,11 @@ export default function Finance() {
                   placeholder="Накоплено"
                   value={goalDrafts[goal.id] ?? ''}
                   onChange={(e) => setGoalDrafts({ ...goalDrafts, [goal.id]: e.target.value })}
-                  className="w-32 rounded-lg border border-neutral-800 bg-neutral-900 px-2 py-1 text-xs outline-none focus:border-emerald-600"
+                  className="w-32 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs outline-none focus:border-emerald-600"
                 />
                 <button
                   onClick={() => handleUpdateGoal(goal.id)}
-                  className="rounded-lg bg-neutral-800 px-2 py-1 text-xs text-neutral-300 hover:bg-neutral-700"
+                  className="rounded-lg bg-neutral-100 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-200"
                 >
                   Обновить
                 </button>
@@ -162,25 +162,25 @@ export default function Finance() {
           {goals.length === 0 && <p className="text-sm text-neutral-500">Пока нет целей</p>}
         </div>
 
-        <form onSubmit={handleAddGoal} className="mt-4 flex flex-wrap gap-2 border-t border-neutral-800 pt-4">
+        <form onSubmit={handleAddGoal} className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
           <input
             value={goalForm.title}
             onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
             placeholder="Название цели"
-            className="flex-1 min-w-[140px] rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="flex-1 min-w-[140px] rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="number"
             value={goalForm.target_amount}
             onChange={(e) => setGoalForm({ ...goalForm, target_amount: e.target.value })}
             placeholder="Сумма цели"
-            className="w-32 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="w-32 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <input
             type="date"
             value={goalForm.target_date}
             onChange={(e) => setGoalForm({ ...goalForm, target_date: e.target.value })}
-            className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600"
           />
           <button
             type="submit"

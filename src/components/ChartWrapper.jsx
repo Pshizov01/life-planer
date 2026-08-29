@@ -25,18 +25,18 @@ const baseOptions = {
     y: {
       beginAtZero: true,
       ticks: { color: '#737373', font: { size: 12 }, maxTicksLimit: 5 },
-      grid: { color: '#27272a' },
+      grid: { color: '#e5e5e5' },
       border: { display: false },
     },
   },
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: '#171717',
-      borderColor: '#27272a',
+      backgroundColor: '#ffffff',
+      borderColor: '#e5e5e5',
       borderWidth: 1,
-      titleColor: '#e5e5e5',
-      bodyColor: '#a3a3a3',
+      titleColor: '#171717',
+      bodyColor: '#525252',
       padding: 10,
       cornerRadius: 8,
       displayColors: false,
