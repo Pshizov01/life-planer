@@ -147,14 +147,26 @@ begin
   end loop;
 end $$;
 
--- ==================== Seed: 5 намазов как обычные привычки ====================
--- Выполнить один раз после того, как единственный пользователь создан
--- (Dashboard → Authentication → Add user), подставив его id ниже.
--- select id from auth.users; -- чтобы найти свой user_id
---
--- insert into habits (user_id, name, sort_order) values
---   ('<ВАШ_USER_ID>', 'Фаджр', 1),
---   ('<ВАШ_USER_ID>', 'Зухр', 2),
---   ('<ВАШ_USER_ID>', 'Аср', 3),
---   ('<ВАШ_USER_ID>', 'Магриб', 4),
---   ('<ВАШ_USER_ID>', 'Иша', 5);
+-- ==================== Автосоздание 5 намазов для каждого нового пользователя ====================
+-- Триггер на auth.users: срабатывает при регистрации любого пользователя
+-- (и через email, и через Telegram) — руками ничего сеять больше не нужно.
+create or replace function public.seed_default_prayer_habits()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.habits (user_id, name, sort_order) values
+    (new.id, 'Фаджр', 1),
+    (new.id, 'Зухр', 2),
+    (new.id, 'Аср', 3),
+    (new.id, 'Магриб', 4),
+    (new.id, 'Иша', 5);
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created_seed_prayers
+  after insert on auth.users
+  for each row execute function public.seed_default_prayer_habits();
