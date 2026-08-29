@@ -39,17 +39,17 @@ export function useHabits() {
 
   async function toggleLog(habitId, date) {
     const existing = logs.find((l) => l.habit_id === habitId && l.date === date)
-    if (existing) {
-      await supabase.from('habit_logs').delete().eq('id', existing.id)
-    } else {
-      await supabase.from('habit_logs').insert({ habit_id: habitId, date, done: true })
-    }
+    const { error } = existing
+      ? await supabase.from('habit_logs').delete().eq('id', existing.id)
+      : await supabase.from('habit_logs').insert({ habit_id: habitId, date, done: true })
+    if (error) throw error
     await reload()
   }
 
   async function addHabit(name) {
     const nextOrder = habits.length > 0 ? Math.max(...habits.map((h) => h.sort_order)) + 1 : 0
-    await supabase.from('habits').insert({ name, sort_order: nextOrder })
+    const { error } = await supabase.from('habits').insert({ name, sort_order: nextOrder })
+    if (error) throw error
     await reload()
   }
 

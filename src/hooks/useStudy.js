@@ -21,17 +21,20 @@ export function useStudy() {
   }, [reload])
 
   async function addGoal({ title, target, unit }) {
-    await supabase.from('study_goals').insert({ title, target, unit, progress: 0 })
+    const { error } = await supabase.from('study_goals').insert({ title, target, unit, progress: 0 })
+    if (error) throw error
     await reload()
   }
 
   async function updateGoalProgress(goalId, progress) {
-    await supabase.from('study_goals').update({ progress }).eq('id', goalId)
+    const { error } = await supabase.from('study_goals').update({ progress }).eq('id', goalId)
+    if (error) throw error
     await reload()
   }
 
   async function addSession({ date, subject, duration_min }) {
-    await supabase.from('study_sessions').insert({ date, subject, duration_min })
+    const { error } = await supabase.from('study_sessions').insert({ date, subject, duration_min })
+    if (error) throw error
     await reload()
   }
 

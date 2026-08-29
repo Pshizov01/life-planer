@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
+import { today } from '../lib/dates'
 
 export function useFocusSessions() {
   const [sessions, setSessions] = useState([])
@@ -20,7 +17,8 @@ export function useFocusSessions() {
   }, [reload])
 
   async function logSession(duration_min) {
-    await supabase.from('focus_sessions').insert({ date: today(), duration_min })
+    const { error } = await supabase.from('focus_sessions').insert({ date: today(), duration_min })
+    if (error) throw error
     await reload()
   }
 

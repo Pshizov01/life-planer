@@ -21,17 +21,24 @@ export function useFinance() {
   }, [reload])
 
   async function addTransaction({ date, type, category, amount, note }) {
-    await supabase.from('finance_transactions').insert({ date, type, category, amount, note: note || null })
+    const { error } = await supabase
+      .from('finance_transactions')
+      .insert({ date, type, category, amount, note: note || null })
+    if (error) throw error
     await reload()
   }
 
   async function addGoal({ title, target_amount, target_date }) {
-    await supabase.from('finance_goals').insert({ title, target_amount, target_date: target_date || null, current_amount: 0 })
+    const { error } = await supabase
+      .from('finance_goals')
+      .insert({ title, target_amount, target_date: target_date || null, current_amount: 0 })
+    if (error) throw error
     await reload()
   }
 
   async function updateGoalAmount(goalId, current_amount) {
-    await supabase.from('finance_goals').update({ current_amount }).eq('id', goalId)
+    const { error } = await supabase.from('finance_goals').update({ current_amount }).eq('id', goalId)
+    if (error) throw error
     await reload()
   }
 

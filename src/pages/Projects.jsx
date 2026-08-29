@@ -1,25 +1,60 @@
 import { useState } from 'react'
 import { useProjects } from '../hooks/useProjects'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ProgressBar } from '../components/ProgressBar'
 
 const emptyProject = { title: '', description: '' }
 
-function ProjectCard({ project, tasks, onAddTask, onToggleTask }) {
+function ProjectCard({ project, tasks, onAddTask, onToggleTask, onDelete }) {
   const [taskTitle, setTaskTitle] = useState('')
+  const [error, setError] = useState(null)
   const done = tasks.filter((t) => t.done).length
 
   async function handleAddTask(e) {
     e.preventDefault()
     if (!taskTitle.trim()) return
-    await onAddTask(project.id, taskTitle.trim())
-    setTaskTitle('')
+    try {
+      await onAddTask(project.id, taskTitle.trim())
+      setTaskTitle('')
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
+  async function handleToggleTask(task) {
+    try {
+      await onToggleTask(task.id, task.done)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(`Удалить проект «${project.title}» вместе со всеми задачами?`)) return
+    try {
+      await onDelete(project.id)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   return (
     <Card>
-      <h3 className="text-base font-semibold">{project.title}</h3>
-      {project.description && <p className="mt-1 text-sm text-neutral-500">{project.description}</p>}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold">{project.title}</h3>
+          {project.description && <p className="mt-1 text-sm text-neutral-500">{project.description}</p>}
+        </div>
+        <button
+          onClick={handleDelete}
+          className="shrink-0 rounded-lg px-2 py-1 text-xs text-neutral-400 hover:bg-red-50 hover:text-red-600"
+        >
+          Удалить
+        </button>
+      </div>
 
       <div className="mt-3">
         <ProgressBar value={done} max={tasks.length || 1} />
@@ -29,7 +64,7 @@ function ProjectCard({ project, tasks, onAddTask, onToggleTask }) {
         {tasks.map((task) => (
           <li key={task.id}>
             <button
-              onClick={() => onToggleTask(task.id, task.done)}
+              onClick={() => handleToggleTask(task)}
               className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-neutral-50"
             >
               <span
@@ -60,19 +95,26 @@ function ProjectCard({ project, tasks, onAddTask, onToggleTask }) {
           Добавить
         </button>
       </form>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </Card>
   )
 }
 
 export default function Projects() {
-  const { projects, tasks, loading, addProject, addTask, toggleTask } = useProjects()
+  const { projects, tasks, loading, addProject, deleteProject, addTask, toggleTask } = useProjects()
   const [form, setForm] = useState(emptyProject)
+  const [error, setError] = useState(null)
 
   async function handleAddProject(e) {
     e.preventDefault()
     if (!form.title.trim()) return
-    await addProject({ title: form.title.trim(), description: form.description.trim() })
-    setForm(emptyProject)
+    try {
+      await addProject({ title: form.title.trim(), description: form.description.trim() })
+      setForm(emptyProject)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
@@ -102,6 +144,7 @@ export default function Projects() {
             Добавить
           </button>
         </form>
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </Card>
 
       {projects.map((project) => (
@@ -111,6 +154,7 @@ export default function Projects() {
           tasks={tasks.filter((t) => t.project_id === project.id)}
           onAddTask={addTask}
           onToggleTask={toggleTask}
+          onDelete={deleteProject}
         />
       ))}
 

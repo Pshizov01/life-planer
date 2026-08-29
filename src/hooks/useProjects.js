@@ -21,21 +21,32 @@ export function useProjects() {
   }, [reload])
 
   async function addProject({ title, description }) {
-    await supabase.from('projects').insert({ title, description: description || null })
+    const { error } = await supabase.from('projects').insert({ title, description: description || null })
+    if (error) throw error
+    await reload()
+  }
+
+  async function deleteProject(projectId) {
+    const { error } = await supabase.from('projects').delete().eq('id', projectId)
+    if (error) throw error
     await reload()
   }
 
   async function addTask(projectId, title) {
     const existing = tasks.filter((t) => t.project_id === projectId)
     const nextOrder = existing.length > 0 ? Math.max(...existing.map((t) => t.sort_order)) + 1 : 0
-    await supabase.from('project_tasks').insert({ project_id: projectId, title, sort_order: nextOrder })
+    const { error } = await supabase
+      .from('project_tasks')
+      .insert({ project_id: projectId, title, sort_order: nextOrder })
+    if (error) throw error
     await reload()
   }
 
   async function toggleTask(taskId, done) {
-    await supabase.from('project_tasks').update({ done: !done }).eq('id', taskId)
+    const { error } = await supabase.from('project_tasks').update({ done: !done }).eq('id', taskId)
+    if (error) throw error
     await reload()
   }
 
-  return { projects, tasks, loading, addProject, addTask, toggleTask }
+  return { projects, tasks, loading, addProject, deleteProject, addTask, toggleTask }
 }

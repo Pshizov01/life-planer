@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useDailyLog } from '../hooks/useDailyLog'
+import { today } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
-
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
 
 const emptyForm = { weight_kg: '', meals_count: '', water_glasses: '', sleep_hours: '', plan_score: '' }
 
@@ -41,15 +39,19 @@ export default function Nutrition() {
       setError('Оценка должна быть от 1 до 5')
       return
     }
-    setError(null)
-    await saveDay({
-      date,
-      weight_kg: toNullableNumber(form.weight_kg),
-      meals_count: toNullableNumber(form.meals_count),
-      water_glasses: toNullableNumber(form.water_glasses),
-      sleep_hours: toNullableNumber(form.sleep_hours),
-      plan_score: score,
-    })
+    try {
+      await saveDay({
+        date,
+        weight_kg: toNullableNumber(form.weight_kg),
+        meals_count: toNullableNumber(form.meals_count),
+        water_glasses: toNullableNumber(form.water_glasses),
+        sleep_hours: toNullableNumber(form.sleep_hours),
+        plan_score: score,
+      })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>

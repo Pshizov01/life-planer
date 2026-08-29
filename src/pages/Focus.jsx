@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useFocusSessions } from '../hooks/useFocusSessions'
 import { sumByWeek } from '../lib/calculations'
+import { today } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 
@@ -13,15 +15,12 @@ function formatTime(totalSeconds) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
-
 export default function Focus() {
   const { sessions, loading, logSession } = useFocusSessions()
   const [mode, setMode] = useState('focus')
   const [secondsLeft, setSecondsLeft] = useState(FOCUS_MIN * 60)
   const [running, setRunning] = useState(false)
+  const [error, setError] = useState(null)
   const intervalRef = useRef(null)
 
   useEffect(() => {
@@ -34,6 +33,8 @@ export default function Focus() {
           setRunning(false)
           if (mode === 'focus') {
             logSession(FOCUS_MIN)
+              .then(() => setError(null))
+              .catch(() => setError(GENERIC_ERROR))
             setMode('break')
             return BREAK_MIN * 60
           }
@@ -68,6 +69,7 @@ export default function Focus() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Фокус</h1>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card>
         <div className="flex flex-col items-center gap-4 py-4">

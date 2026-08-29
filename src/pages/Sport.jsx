@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { sumByWeek } from '../lib/calculations'
+import { today } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
-
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
 
 const emptyForm = { date: today(), type: '', duration_min: '', note: '' }
 
@@ -22,9 +20,13 @@ export default function Sport() {
       setError('Укажи тип тренировки и длительность больше 0')
       return
     }
-    setError(null)
-    await addWorkout({ ...form, type: form.type.trim(), duration_min: duration })
-    setForm({ ...emptyForm, date: form.date })
+    try {
+      await addWorkout({ ...form, type: form.type.trim(), duration_min: duration })
+      setForm({ ...emptyForm, date: form.date })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>

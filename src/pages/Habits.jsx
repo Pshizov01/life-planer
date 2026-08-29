@@ -2,16 +2,14 @@ import { useState } from 'react'
 import { useHabits } from '../hooks/useHabits'
 import { habitStreak } from '../lib/calculations'
 import { PRAYER_NAMES } from '../lib/constants'
+import { dayLabel } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
-
-function dayLabel(dateStr) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
-}
 
 export default function Habits() {
   const { habits, logs, dates, loading, toggleLog, addHabit } = useHabits()
   const [newHabitName, setNewHabitName] = useState('')
+  const [error, setError] = useState(null)
 
   function isDone(habitId, date) {
     return logs.some((l) => l.habit_id === habitId && l.date === date)
@@ -22,11 +20,25 @@ export default function Habits() {
     return habitStreak(entries)
   }
 
+  async function handleToggle(habitId, date) {
+    try {
+      await toggleLog(habitId, date)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   async function handleAddHabit(e) {
     e.preventDefault()
     if (!newHabitName.trim()) return
-    await addHabit(newHabitName.trim())
-    setNewHabitName('')
+    try {
+      await addHabit(newHabitName.trim())
+      setNewHabitName('')
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
@@ -36,6 +48,7 @@ export default function Habits() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Привычки</h1>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card>
         <div className="overflow-x-auto">
@@ -60,7 +73,7 @@ export default function Habits() {
                     return (
                       <td key={date}>
                         <button
-                          onClick={() => toggleLog(habit.id, date)}
+                          onClick={() => handleToggle(habit.id, date)}
                           aria-label={`${habit.name} ${date}`}
                           className={`h-7 w-7 rounded-md ${
                             done ? 'bg-emerald-500' : 'bg-neutral-100 hover:bg-neutral-200'

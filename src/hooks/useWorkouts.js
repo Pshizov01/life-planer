@@ -16,7 +16,8 @@ export function useWorkouts() {
   }, [reload])
 
   async function addWorkout({ date, type, duration_min, note }) {
-    await supabase.from('workouts').insert({ date, type, duration_min, note: note || null })
+    const { error } = await supabase.from('workouts').insert({ date, type, duration_min, note: note || null })
+    if (error) throw error
     await reload()
   }
 

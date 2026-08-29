@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { useFinance } from '../hooks/useFinance'
 import { sumByCategory } from '../lib/calculations'
+import { today } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
-
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
 
 const emptyTx = { date: today(), type: 'expense', category: '', amount: '', note: '' }
 const emptyGoal = { title: '', target_amount: '', target_date: '' }
@@ -17,28 +15,44 @@ export default function Finance() {
   const [txForm, setTxForm] = useState(emptyTx)
   const [goalForm, setGoalForm] = useState(emptyGoal)
   const [goalDrafts, setGoalDrafts] = useState({})
+  const [error, setError] = useState(null)
 
   async function handleAddTx(e) {
     e.preventDefault()
     const amount = Number(txForm.amount)
     if (!txForm.category.trim() || !amount || amount <= 0) return
-    await addTransaction({ ...txForm, category: txForm.category.trim(), amount })
-    setTxForm({ ...emptyTx, date: txForm.date })
+    try {
+      await addTransaction({ ...txForm, category: txForm.category.trim(), amount })
+      setTxForm({ ...emptyTx, date: txForm.date })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   async function handleAddGoal(e) {
     e.preventDefault()
     const target = Number(goalForm.target_amount)
     if (!goalForm.title.trim() || !target) return
-    await addGoal({ title: goalForm.title.trim(), target_amount: target, target_date: goalForm.target_date })
-    setGoalForm(emptyGoal)
+    try {
+      await addGoal({ title: goalForm.title.trim(), target_amount: target, target_date: goalForm.target_date })
+      setGoalForm(emptyGoal)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   async function handleUpdateGoal(goalId) {
     const value = Number(goalDrafts[goalId])
     if (Number.isNaN(value)) return
-    await updateGoalAmount(goalId, value)
-    setGoalDrafts({ ...goalDrafts, [goalId]: '' })
+    try {
+      await updateGoalAmount(goalId, value)
+      setGoalDrafts({ ...goalDrafts, [goalId]: '' })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
@@ -52,6 +66,7 @@ export default function Finance() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Финансы</h1>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card title="Доходы">

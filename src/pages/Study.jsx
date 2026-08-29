@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { useStudy } from '../hooks/useStudy'
 import { sumByWeek } from '../lib/calculations'
+import { today } from '../lib/dates'
+import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
-
-function today() {
-  return new Date().toLocaleDateString('en-CA')
-}
 
 const emptyGoal = { title: '', target: '', unit: '' }
 const emptySession = { date: today(), subject: '', duration_min: '' }
@@ -17,27 +15,43 @@ export default function Study() {
   const [goalForm, setGoalForm] = useState(emptyGoal)
   const [sessionForm, setSessionForm] = useState(emptySession)
   const [progressDrafts, setProgressDrafts] = useState({})
+  const [error, setError] = useState(null)
 
   async function handleAddGoal(e) {
     e.preventDefault()
     if (!goalForm.title.trim() || !Number(goalForm.target)) return
-    await addGoal({ title: goalForm.title.trim(), target: Number(goalForm.target), unit: goalForm.unit.trim() })
-    setGoalForm(emptyGoal)
+    try {
+      await addGoal({ title: goalForm.title.trim(), target: Number(goalForm.target), unit: goalForm.unit.trim() })
+      setGoalForm(emptyGoal)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   async function handleUpdateProgress(goalId) {
     const value = Number(progressDrafts[goalId])
     if (Number.isNaN(value)) return
-    await updateGoalProgress(goalId, value)
-    setProgressDrafts({ ...progressDrafts, [goalId]: '' })
+    try {
+      await updateGoalProgress(goalId, value)
+      setProgressDrafts({ ...progressDrafts, [goalId]: '' })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   async function handleAddSession(e) {
     e.preventDefault()
     const duration = Number(sessionForm.duration_min)
     if (!sessionForm.subject.trim() || !duration || duration <= 0) return
-    await addSession({ ...sessionForm, subject: sessionForm.subject.trim(), duration_min: duration })
-    setSessionForm({ ...emptySession, date: sessionForm.date })
+    try {
+      await addSession({ ...sessionForm, subject: sessionForm.subject.trim(), duration_min: duration })
+      setSessionForm({ ...emptySession, date: sessionForm.date })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
   }
 
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
@@ -47,6 +61,7 @@ export default function Study() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Учёба</h1>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card title="Цели">
         <div className="flex flex-col gap-4">

@@ -17,11 +17,10 @@ export function useDailyLog() {
 
   async function saveDay(entry) {
     const existing = logs.find((l) => l.date === entry.date)
-    if (existing) {
-      await supabase.from('daily_log').update(entry).eq('id', existing.id)
-    } else {
-      await supabase.from('daily_log').insert(entry)
-    }
+    const { error } = existing
+      ? await supabase.from('daily_log').update(entry).eq('id', existing.id)
+      : await supabase.from('daily_log').insert(entry)
+    if (error) throw error
     await reload()
   }
 

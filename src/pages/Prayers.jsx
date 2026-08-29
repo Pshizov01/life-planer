@@ -1,15 +1,12 @@
+import { useState } from 'react'
 import { useHabits } from '../hooks/useHabits'
 import { goalProgress } from '../lib/calculations'
-import { PRAYER_NAMES } from '../lib/constants'
+import { PRAYER_NAMES, GENERIC_ERROR } from '../lib/constants'
+import { dayLabel, today } from '../lib/dates'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 
-function dayLabel(dateStr) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
-}
-
-function PrayerToday({ prayers, today, isDone, toggleLog }) {
+function PrayerToday({ prayers, today, isDone, onToggle }) {
   return (
     <div className="flex flex-wrap gap-2">
       {prayers.map((prayer) => {
@@ -17,7 +14,7 @@ function PrayerToday({ prayers, today, isDone, toggleLog }) {
         return (
           <button
             key={prayer.id}
-            onClick={() => toggleLog(prayer.id, today)}
+            onClick={() => onToggle(prayer.id, today)}
             className={`flex min-w-[92px] flex-1 flex-col items-center gap-2 rounded-2xl border px-3 py-3 text-sm transition-colors ${
               done
                 ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
@@ -41,15 +38,25 @@ function PrayerToday({ prayers, today, isDone, toggleLog }) {
 
 export default function Prayers() {
   const { habits, logs, dates, loading, toggleLog } = useHabits()
+  const [error, setError] = useState(null)
 
   function isDone(habitId, date) {
     return logs.some((l) => l.habit_id === habitId && l.date === date)
   }
 
+  async function handleToggle(habitId, date) {
+    try {
+      await toggleLog(habitId, date)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const prayers = habits.filter((h) => PRAYER_NAMES.includes(h.name))
-  const today = new Date().toLocaleDateString('en-CA')
+  const todayStr = today()
 
   const prayerCompletion = dates.map((date) => {
     const doneCount = prayers.filter((p) => isDone(p.id, date)).length
@@ -59,6 +66,7 @@ export default function Prayers() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Намаз</h1>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {prayers.length === 0 ? (
         <Card>
@@ -69,7 +77,7 @@ export default function Prayers() {
       ) : (
         <>
           <Card title="Сегодня">
-            <PrayerToday prayers={prayers} today={today} isDone={isDone} toggleLog={toggleLog} />
+            <PrayerToday prayers={prayers} today={todayStr} isDone={isDone} onToggle={handleToggle} />
           </Card>
 
           <Card title="За неделю, % выполнено">
