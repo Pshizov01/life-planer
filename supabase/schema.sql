@@ -65,12 +65,19 @@ create table habit_logs (
   unique (habit_id, date)
 );
 
--- Город для расчёта времени намаза (через api.aladhan.com), одна строка на пользователя
+-- Местоположение для расчёта времени намаза (через api.aladhan.com), одна
+-- строка на пользователя. Либо город+страна, либо координаты (геолокация
+-- надёжнее — геокодер городов у Aladhan нестабилен для многих городов).
 create table prayer_settings (
   user_id uuid primary key default auth.uid() references auth.users on delete cascade,
-  city text not null,
-  country text not null,
-  updated_at timestamptz not null default now()
+  city text,
+  country text,
+  latitude numeric,
+  longitude numeric,
+  updated_at timestamptz not null default now(),
+  constraint location_or_coords check (
+    (city is not null and country is not null) or (latitude is not null and longitude is not null)
+  )
 );
 
 -- ==================== Питание + сон (один ряд в день) ====================

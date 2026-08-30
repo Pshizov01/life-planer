@@ -43,11 +43,14 @@ function LocationSettings({ settings, onSave }) {
   const [city, setCity] = useState(settings?.city ?? '')
   const [country, setCountry] = useState(settings?.country ?? '')
   const [error, setError] = useState(null)
+  const [locating, setLocating] = useState(false)
 
   useEffect(() => {
     setCity(settings?.city ?? '')
     setCountry(settings?.country ?? '')
   }, [settings])
+
+  const usingCoords = settings?.latitude != null && settings?.longitude != null
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -60,8 +63,46 @@ function LocationSettings({ settings, onSave }) {
     }
   }
 
+  function handleUseLocation() {
+    if (!navigator.geolocation) {
+      setError('Геолокация не поддерживается этим браузером')
+      return
+    }
+    setLocating(true)
+    setError(null)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          await onSave({ latitude: position.coords.latitude, longitude: position.coords.longitude })
+          setError(null)
+        } catch {
+          setError(GENERIC_ERROR)
+        } finally {
+          setLocating(false)
+        }
+      },
+      () => {
+        setError('Не удалось определить местоположение — проверь разрешение на геолокацию')
+        setLocating(false)
+      },
+    )
+  }
+
   return (
-    <Card title="Город для расчёта времени намаза">
+    <Card title="Местоположение для расчёта времени намаза">
+      {usingCoords && (
+        <p className="mb-2 text-xs text-neutral-500">Сейчас используется геолокация (самый надёжный вариант).</p>
+      )}
+
+      <button
+        onClick={handleUseLocation}
+        disabled={locating}
+        className="mb-3 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+      >
+        {locating ? 'Определяем…' : 'Определить моё местоположение'}
+      </button>
+
+      <p className="mb-2 text-xs text-neutral-500">Или укажи город вручную:</p>
       <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
         <input
           value={city}
@@ -77,7 +118,7 @@ function LocationSettings({ settings, onSave }) {
         />
         <button
           type="submit"
-          className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+          className="rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200"
         >
           Сохранить
         </button>
@@ -90,7 +131,7 @@ function LocationSettings({ settings, onSave }) {
 export default function Prayers() {
   const { habits, logs, dates, loading, toggleLog } = useHabits()
   const { settings, loading: settingsLoading, saveLocation } = usePrayerSettings()
-  const { times, error: timesError } = usePrayerTimes(settings?.city, settings?.country)
+  const { times, error: timesError } = usePrayerTimes(settings)
   const [error, setError] = useState(null)
 
   function isDone(habitId, date) {

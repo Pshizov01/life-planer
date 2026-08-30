@@ -15,10 +15,18 @@ export function usePrayerSettings() {
     reload()
   }, [reload])
 
-  async function saveLocation({ city, country }) {
+  // payload — либо { city, country }, либо { latitude, longitude };
+  // сохранение одного варианта очищает другой, чтобы не было рассинхрона.
+  async function saveLocation(payload) {
+    const row = {
+      city: payload.city ?? null,
+      country: payload.country ?? null,
+      latitude: payload.latitude ?? null,
+      longitude: payload.longitude ?? null,
+    }
     const { error } = settings
-      ? await supabase.from('prayer_settings').update({ city, country }).eq('user_id', settings.user_id)
-      : await supabase.from('prayer_settings').insert({ city, country })
+      ? await supabase.from('prayer_settings').update(row).eq('user_id', settings.user_id)
+      : await supabase.from('prayer_settings').insert(row)
     if (error) throw error
     await reload()
   }
