@@ -46,3 +46,17 @@ export function sumByCategory(entries) {
     .sort(([, a], [, b]) => b - a)
     .map(([category, total]) => ({ category, total }))
 }
+
+const ALADHAN_KEY_TO_PRAYER_NAME = { Fajr: 'Фаджр', Dhuhr: 'Зухр', Asr: 'Аср', Maghrib: 'Магриб', Isha: 'Иша' }
+
+// timings: объект вида { Fajr: 'HH:mm' | 'HH:mm (TZ)', Dhuhr, Asr, Maghrib, Isha }
+// от api.aladhan.com — сопоставляет с русскими названиями намазов и убирает
+// суффикс часового пояса, если он есть.
+export function mapPrayerTimings(timings) {
+  const result = {}
+  for (const [key, name] of Object.entries(ALADHAN_KEY_TO_PRAYER_NAME)) {
+    const raw = timings?.[key]
+    result[name] = raw ? raw.split(' ')[0] : null
+  }
+  return result
+}

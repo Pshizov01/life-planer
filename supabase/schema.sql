@@ -35,6 +35,18 @@ create table study_sessions (
   created_at timestamptz not null default now()
 );
 
+-- Расписание пар — вводится вручную (день недели + время + предмет)
+create table class_schedule (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  day_of_week int not null check (day_of_week between 1 and 7), -- 1=Пн ... 7=Вс
+  start_time time not null,
+  end_time time,
+  subject text not null,
+  room text,
+  created_at timestamptz not null default now()
+);
+
 -- ==================== Привычки (включая намазы) ====================
 create table habits (
   id uuid primary key default gen_random_uuid(),
@@ -51,6 +63,14 @@ create table habit_logs (
   date date not null,
   done boolean not null default true,
   unique (habit_id, date)
+);
+
+-- Город для расчёта времени намаза (через api.aladhan.com), одна строка на пользователя
+create table prayer_settings (
+  user_id uuid primary key default auth.uid() references auth.users on delete cascade,
+  city text not null,
+  country text not null,
+  updated_at timestamptz not null default now()
 );
 
 -- ==================== Питание + сон (один ряд в день) ====================
@@ -129,6 +149,8 @@ alter table finance_goals enable row level security;
 alter table focus_sessions enable row level security;
 alter table projects enable row level security;
 alter table project_tasks enable row level security;
+alter table class_schedule enable row level security;
+alter table prayer_settings enable row level security;
 
 do $$
 declare
@@ -137,7 +159,7 @@ begin
   foreach t in array array[
     'workouts', 'study_goals', 'study_sessions', 'habits',
     'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
-    'focus_sessions', 'projects', 'project_tasks'
+    'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings'
   ]
   loop
     execute format(

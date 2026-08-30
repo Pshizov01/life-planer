@@ -6,6 +6,7 @@ import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
+import { ClassSchedule } from '../components/ClassSchedule'
 
 const emptyGoal = { title: '', target: '', unit: '' }
 const emptySession = { date: today(), subject: '', duration_min: '' }
@@ -62,6 +63,8 @@ export default function Study() {
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">Учёба</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <ClassSchedule />
 
       <Card title="Цели">
         <div className="flex flex-col gap-4">

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { habitStreak, sumByWeek, goalProgress, sumByCategory } from './calculations.js'
+import { habitStreak, sumByWeek, goalProgress, sumByCategory, mapPrayerTimings } from './calculations.js'
 
 describe('habitStreak', () => {
   it('returns 0 for no logs', () => {
@@ -104,5 +104,27 @@ describe('sumByCategory', () => {
       { category: 'Развлечения', total: 25 },
       { category: 'Транспорт', total: 10 },
     ])
+  })
+})
+
+describe('mapPrayerTimings', () => {
+  it('maps Aladhan English keys to Russian prayer names', () => {
+    const timings = { Fajr: '04:12', Dhuhr: '12:30', Asr: '16:45', Maghrib: '19:50', Isha: '21:20' }
+    expect(mapPrayerTimings(timings)).toEqual({
+      Фаджр: '04:12',
+      Зухр: '12:30',
+      Аср: '16:45',
+      Магриб: '19:50',
+      Иша: '21:20',
+    })
+  })
+
+  it('strips a trailing timezone label from a timing', () => {
+    const timings = { Fajr: '04:12 (MSK)', Dhuhr: '12:30', Asr: '16:45', Maghrib: '19:50', Isha: '21:20' }
+    expect(mapPrayerTimings(timings).Фаджр).toBe('04:12')
+  })
+
+  it('returns null for a missing timing instead of throwing', () => {
+    expect(mapPrayerTimings({}).Фаджр).toBeNull()
   })
 })
