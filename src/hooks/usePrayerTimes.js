@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react'
 import { mapPrayerTimings } from '../lib/calculations'
+import { transliterate, toLatinCountryName } from '../lib/transliterate'
 
 // method=14 — расчёт по методике Духовного управления мусульман России
 const ALADHAN_METHOD = 14
+
+async function fetchTimings(city, country) {
+  const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${ALADHAN_METHOD}`
+  const response = await fetch(url)
+  const json = await response.json()
+  if (json.code !== 200 || !json.data?.timings) {
+    throw new Error('Aladhan API error')
+  }
+  return json.data.timings
+}
 
 export function usePrayerTimes(city, country) {
   const [times, setTimes] = useState(null)
@@ -13,30 +24,34 @@ export function usePrayerTimes(city, country) {
     if (!city || !country) {
       setTimes(null)
       setError(null)
-      return
+      return undefined
     }
 
     let cancelled = false
     setLoading(true)
     setError(null)
 
-    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${ALADHAN_METHOD}`
+    async function load() {
+      try {
+        const timings = await fetchTimings(city, country)
+        if (!cancelled) setTimes(mapPrayerTimings(timings))
+        return
+      } catch {
+        // Геокодер Aladhan не всегда распознаёт кириллические названия —
+        // пробуем ещё раз транслитерацией в латиницу, прежде чем сдаться.
+      }
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((json) => {
-        if (cancelled) return
-        if (json.code !== 200 || !json.data?.timings) {
-          throw new Error('bad response')
-        }
-        setTimes(mapPrayerTimings(json.data.timings))
-      })
-      .catch(() => {
+      try {
+        const timings = await fetchTimings(transliterate(city), toLatinCountryName(country))
+        if (!cancelled) setTimes(mapPrayerTimings(timings))
+      } catch {
         if (!cancelled) setError('Не удалось загрузить время намаза для этого города')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+      }
+    }
+
+    load().finally(() => {
+      if (!cancelled) setLoading(false)
+    })
 
     return () => {
       cancelled = true
