@@ -1,12 +1,48 @@
 import { useState } from 'react'
 import { useWorkouts } from '../hooks/useWorkouts'
-import { sumByWeek } from '../lib/calculations'
-import { today } from '../lib/dates'
+import { sumByWeek, groupByMonth } from '../lib/calculations'
+import { today, monthLabel } from '../lib/dates'
 import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 
 const emptyForm = { date: today(), type: '', duration_min: '', note: '' }
+
+function WorkoutHistory({ workouts }) {
+  const groups = groupByMonth(workouts)
+
+  if (groups.length === 0) {
+    return <p className="py-4 text-center text-neutral-500">Пока нет тренировок</p>
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {groups.map((group, index) => {
+        const totalMin = group.items.reduce((sum, w) => sum + w.duration_min, 0)
+        return (
+          <details key={group.month} open={index === 0} className="group rounded-lg border border-neutral-200">
+            <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 text-sm font-medium">
+              <span>{monthLabel(group.month)}</span>
+              <span className="text-xs font-normal text-neutral-500">
+                {group.items.length} · {totalMin} мин
+              </span>
+            </summary>
+            <div className="flex flex-col divide-y divide-neutral-200 border-t border-neutral-200">
+              {group.items.map((w) => (
+                <div key={w.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                  <span className="shrink-0 text-neutral-500">{w.date}</span>
+                  <span className="min-w-0 flex-1 truncate px-1">{w.type}</span>
+                  <span className="shrink-0 text-neutral-500">{w.duration_min} мин</span>
+                  {w.note && <span className="max-w-[30%] shrink truncate text-neutral-500">{w.note}</span>}
+                </div>
+              ))}
+            </div>
+          </details>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function Sport() {
   const { workouts, loading, addWorkout } = useWorkouts()
@@ -88,18 +124,8 @@ export default function Sport() {
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </Card>
 
-      <Card title="История">
-        <div className="flex flex-col divide-y divide-neutral-200">
-          {workouts.map((w) => (
-            <div key={w.id} className="flex items-center justify-between gap-2 py-2 text-sm">
-              <span className="shrink-0 text-neutral-500">{w.date}</span>
-              <span className="min-w-0 flex-1 truncate px-1">{w.type}</span>
-              <span className="shrink-0 text-neutral-500">{w.duration_min} мин</span>
-              {w.note && <span className="max-w-[30%] shrink truncate text-neutral-500">{w.note}</span>}
-            </div>
-          ))}
-          {workouts.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет тренировок</p>}
-        </div>
+      <Card title="История по месяцам">
+        <WorkoutHistory workouts={workouts} />
       </Card>
     </div>
   )

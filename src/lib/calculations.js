@@ -60,3 +60,18 @@ export function mapPrayerTimings(timings) {
   }
   return result
 }
+
+// entries: [{ date: 'YYYY-MM-DD', ... }, ...] — предполагается уже
+// отсортированным по убыванию даты (как приходит из хуков).
+// Возвращает [{ month: 'YYYY-MM', items: [...] }] по убыванию месяца.
+export function groupByMonth(entries) {
+  const groups = new Map()
+  for (const entry of entries) {
+    const month = entry.date.slice(0, 7)
+    if (!groups.has(month)) groups.set(month, [])
+    groups.get(month).push(entry)
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([month, items]) => ({ month, items }))
+}

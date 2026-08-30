@@ -53,5 +53,11 @@ export function useHabits() {
     await reload()
   }
 
-  return { habits, logs, dates, loading, toggleLog, addHabit }
+  async function deleteHabit(habitId) {
+    const { error } = await supabase.from('habits').delete().eq('id', habitId)
+    if (error) throw error
+    await reload()
+  }
+
+  return { habits, logs, dates, loading, toggleLog, addHabit, deleteHabit }
 }

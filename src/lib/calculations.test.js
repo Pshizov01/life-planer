@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { habitStreak, sumByWeek, goalProgress, sumByCategory, mapPrayerTimings } from './calculations.js'
+import { habitStreak, sumByWeek, goalProgress, sumByCategory, mapPrayerTimings, groupByMonth } from './calculations.js'
 
 describe('habitStreak', () => {
   it('returns 0 for no logs', () => {
@@ -126,5 +126,29 @@ describe('mapPrayerTimings', () => {
 
   it('returns null for a missing timing instead of throwing', () => {
     expect(mapPrayerTimings({}).Фаджр).toBeNull()
+  })
+})
+
+describe('groupByMonth', () => {
+  it('returns an empty array for no entries', () => {
+    expect(groupByMonth([])).toEqual([])
+  })
+
+  it('groups entries by year-month and sorts months newest first', () => {
+    const entries = [
+      { date: '2026-08-20', id: 1 },
+      { date: '2026-07-15', id: 2 },
+      { date: '2026-08-05', id: 3 },
+    ]
+    expect(groupByMonth(entries)).toEqual([
+      {
+        month: '2026-08',
+        items: [
+          { date: '2026-08-20', id: 1 },
+          { date: '2026-08-05', id: 3 },
+        ],
+      },
+      { month: '2026-07', items: [{ date: '2026-07-15', id: 2 }] },
+    ])
   })
 })

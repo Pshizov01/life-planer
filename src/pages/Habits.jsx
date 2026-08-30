@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useHabits } from '../hooks/useHabits'
 import { habitStreak } from '../lib/calculations'
-import { PRAYER_NAMES } from '../lib/constants'
+import { PRAYER_NAMES, GENERIC_ERROR } from '../lib/constants'
 import { dayLabel } from '../lib/dates'
-import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 
 export default function Habits() {
-  const { habits, logs, dates, loading, toggleLog, addHabit } = useHabits()
+  const { habits, logs, dates, loading, toggleLog, addHabit, deleteHabit } = useHabits()
   const [newHabitName, setNewHabitName] = useState('')
   const [error, setError] = useState(null)
 
@@ -41,6 +40,16 @@ export default function Habits() {
     }
   }
 
+  async function handleDelete(habit) {
+    if (!window.confirm(`Удалить привычку «${habit.name}»? История отметок тоже удалится.`)) return
+    try {
+      await deleteHabit(habit.id)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const personalHabits = habits.filter((h) => !PRAYER_NAMES.includes(h.name))
@@ -62,6 +71,7 @@ export default function Habits() {
                   </th>
                 ))}
                 <th className="text-left font-medium text-neutral-500">Стрик</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -83,11 +93,20 @@ export default function Habits() {
                     )
                   })}
                   <td className="pl-2 text-neutral-500">{streakFor(habit.id)}</td>
+                  <td>
+                    <button
+                      onClick={() => handleDelete(habit)}
+                      aria-label={`Удалить ${habit.name}`}
+                      className="px-2 text-xs text-neutral-400 hover:text-red-600"
+                    >
+                      ✕
+                    </button>
+                  </td>
                 </tr>
               ))}
               {personalHabits.length === 0 && (
                 <tr>
-                  <td colSpan={dates.length + 2} className="py-4 text-center text-neutral-500">
+                  <td colSpan={dates.length + 3} className="py-4 text-center text-neutral-500">
                     Пока нет привычек
                   </td>
                 </tr>
