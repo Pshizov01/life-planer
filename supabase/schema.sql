@@ -144,6 +144,16 @@ create table project_tasks (
   created_at timestamptz not null default now()
 );
 
+-- ==================== API-токен для быстрого добавления трат (iOS Shortcuts) ====================
+-- Хранится хэш токена, не сам токен — как с паролями. Проверяется в
+-- api/log-expense.js через service_role (в обход RLS, т.к. запрос
+-- приходит без обычной сессии Supabase).
+create table api_tokens (
+  user_id uuid primary key default auth.uid() references auth.users on delete cascade,
+  token_hash text not null,
+  created_at timestamptz not null default now()
+);
+
 -- ==================== RLS: включаем и ограничиваем доступ владельцем ====================
 alter table workouts enable row level security;
 alter table study_goals enable row level security;
@@ -158,6 +168,7 @@ alter table projects enable row level security;
 alter table project_tasks enable row level security;
 alter table class_schedule enable row level security;
 alter table prayer_settings enable row level security;
+alter table api_tokens enable row level security;
 
 do $$
 declare
@@ -166,7 +177,8 @@ begin
   foreach t in array array[
     'workouts', 'study_goals', 'study_sessions', 'habits',
     'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
-    'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings'
+    'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings',
+    'api_tokens'
   ]
   loop
     execute format(

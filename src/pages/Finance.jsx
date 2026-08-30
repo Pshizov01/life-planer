@@ -6,6 +6,7 @@ import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
+import { QuickAddToken } from '../components/QuickAddToken'
 
 const emptyTx = { date: today(), type: 'expense', category: '', amount: '', note: '' }
 const emptyGoal = { title: '', target_amount: '', target_date: '' }
@@ -148,6 +149,8 @@ export default function Finance() {
           {transactions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет транзакций</p>}
         </div>
       </Card>
+
+      <QuickAddToken />
 
       <Card title="Финансовые цели">
         <div className="flex flex-col gap-4">
