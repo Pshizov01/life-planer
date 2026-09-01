@@ -13,7 +13,8 @@ const emptyTx = { date: today(), type: 'expense', category: '', amount: '', note
 const emptyGoal = { title: '', target_amount: '', target_date: '' }
 
 export default function Finance() {
-  const { transactions, goals, loading, addTransaction, addGoal, updateGoalAmount } = useFinance()
+  const { transactions, goals, loading, addTransaction, addGoal, updateGoalAmount, deleteTransaction, deleteGoal } =
+    useFinance()
   const [txForm, setTxForm] = useState(emptyTx)
   const [goalForm, setGoalForm] = useState(emptyGoal)
   const [goalDrafts, setGoalDrafts] = useState({})
@@ -51,6 +52,26 @@ export default function Finance() {
     try {
       await updateGoalAmount(goalId, value)
       setGoalDrafts({ ...goalDrafts, [goalId]: '' })
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
+  async function handleDeleteTx(id) {
+    if (!window.confirm('Удалить эту транзакцию?')) return
+    try {
+      await deleteTransaction(id)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
+  async function handleDeleteGoal(goalId) {
+    if (!window.confirm('Удалить эту цель?')) return
+    try {
+      await deleteGoal(goalId)
       setError(null)
     } catch {
       setError(GENERIC_ERROR)
@@ -145,6 +166,13 @@ export default function Finance() {
                 {t.type === 'income' ? '+' : '-'}
                 {t.amount}
               </span>
+              <button
+                onClick={() => handleDeleteTx(t.id)}
+                aria-label="Удалить транзакцию"
+                className="shrink-0 text-xs text-neutral-400 hover:text-red-600"
+              >
+                ✕
+              </button>
             </div>
           ))}
           {transactions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет транзакций</p>}
@@ -155,9 +183,18 @@ export default function Finance() {
         <div className="flex flex-col gap-4">
           {goals.map((goal) => (
             <div key={goal.id}>
-              <p className="mb-1 text-sm">
-                {goal.title} {goal.target_date && <span className="text-neutral-500">до {goal.target_date}</span>}
-              </p>
+              <div className="mb-1 flex items-center justify-between">
+                <p className="text-sm">
+                  {goal.title} {goal.target_date && <span className="text-neutral-500">до {goal.target_date}</span>}
+                </p>
+                <button
+                  onClick={() => handleDeleteGoal(goal.id)}
+                  aria-label="Удалить цель"
+                  className="text-xs text-neutral-400 hover:text-red-600"
+                >
+                  ✕
+                </button>
+              </div>
               <ProgressBar value={goal.current_amount} max={goal.target_amount} />
               <div className="mt-1 flex gap-2">
                 <input

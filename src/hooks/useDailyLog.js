@@ -24,5 +24,13 @@ export function useDailyLog() {
     await reload()
   }
 
-  return { logs, loading, saveDay }
+  async function deleteDay(date) {
+    const existing = logs.find((l) => l.date === date)
+    if (!existing) return
+    const { error } = await supabase.from('daily_log').delete().eq('id', existing.id)
+    if (error) throw error
+    await reload()
+  }
+
+  return { logs, loading, saveDay, deleteDay }
 }

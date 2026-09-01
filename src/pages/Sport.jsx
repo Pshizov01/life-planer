@@ -10,7 +10,7 @@ import { PageHeading } from '../components/PageHeading'
 
 const emptyForm = { date: today(), type: '', duration_min: '', note: '' }
 
-function WorkoutHistory({ workouts }) {
+function WorkoutHistory({ workouts, onDelete }) {
   const groups = groupByMonth(workouts)
 
   if (groups.length === 0) {
@@ -36,6 +36,13 @@ function WorkoutHistory({ workouts }) {
                   <span className="min-w-0 flex-1 truncate px-1">{w.type}</span>
                   <span className="shrink-0 text-neutral-500">{w.duration_min} мин</span>
                   {w.note && <span className="max-w-[30%] shrink truncate text-neutral-500">{w.note}</span>}
+                  <button
+                    onClick={() => onDelete(w.id)}
+                    aria-label="Удалить тренировку"
+                    className="shrink-0 text-xs text-neutral-400 hover:text-red-600"
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>
@@ -47,7 +54,7 @@ function WorkoutHistory({ workouts }) {
 }
 
 export default function Sport() {
-  const { workouts, loading, addWorkout } = useWorkouts()
+  const { workouts, loading, addWorkout, deleteWorkout } = useWorkouts()
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState(null)
 
@@ -67,6 +74,16 @@ export default function Sport() {
     }
   }
 
+  async function handleDelete(id) {
+    if (!window.confirm('Удалить эту тренировку?')) return
+    try {
+      await deleteWorkout(id)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const weekly = sumByWeek(workouts.map((w) => ({ date: w.date, value: w.duration_min })))
@@ -74,6 +91,7 @@ export default function Sport() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeading icon={Dumbbell} color="text-teal-600">Спорт</PageHeading>
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card title="Длительность по неделям, мин">
         {weekly.length > 0 ? (
@@ -123,11 +141,10 @@ export default function Sport() {
             Добавить
           </button>
         </form>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </Card>
 
       <Card title="История по месяцам">
-        <WorkoutHistory workouts={workouts} />
+        <WorkoutHistory workouts={workouts} onDelete={handleDelete} />
       </Card>
     </div>
   )

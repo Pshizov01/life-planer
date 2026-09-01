@@ -14,7 +14,7 @@ const emptyGoal = { title: '', target: '', unit: '' }
 const emptySession = { date: today(), subject: '', duration_min: '' }
 
 export default function Study() {
-  const { goals, sessions, loading, addGoal, updateGoalProgress, addSession } = useStudy()
+  const { goals, sessions, loading, addGoal, updateGoalProgress, addSession, deleteGoal, deleteSession } = useStudy()
   const [goalForm, setGoalForm] = useState(emptyGoal)
   const [sessionForm, setSessionForm] = useState(emptySession)
   const [progressDrafts, setProgressDrafts] = useState({})
@@ -57,6 +57,26 @@ export default function Study() {
     }
   }
 
+  async function handleDeleteGoal(goalId) {
+    if (!window.confirm('Удалить эту цель?')) return
+    try {
+      await deleteGoal(goalId)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
+  async function handleDeleteSession(sessionId) {
+    if (!window.confirm('Удалить эту сессию занятий?')) return
+    try {
+      await deleteSession(sessionId)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const weekly = sumByWeek(sessions.map((s) => ({ date: s.date, value: s.duration_min })))
@@ -72,9 +92,18 @@ export default function Study() {
         <div className="flex flex-col gap-4">
           {goals.map((goal) => (
             <div key={goal.id}>
-              <p className="mb-1 text-sm">
-                {goal.title} {goal.unit && <span className="text-neutral-500">({goal.unit})</span>}
-              </p>
+              <div className="mb-1 flex items-center justify-between">
+                <p className="text-sm">
+                  {goal.title} {goal.unit && <span className="text-neutral-500">({goal.unit})</span>}
+                </p>
+                <button
+                  onClick={() => handleDeleteGoal(goal.id)}
+                  aria-label="Удалить цель"
+                  className="text-xs text-neutral-400 hover:text-red-600"
+                >
+                  ✕
+                </button>
+              </div>
               <ProgressBar value={goal.progress} max={goal.target} />
               <div className="mt-1 flex gap-2">
                 <input
@@ -171,6 +200,13 @@ export default function Study() {
               <span className="shrink-0 text-neutral-500">{s.date}</span>
               <span className="min-w-0 flex-1 truncate px-1">{s.subject}</span>
               <span className="shrink-0 text-neutral-500">{s.duration_min} мин</span>
+              <button
+                onClick={() => handleDeleteSession(s.id)}
+                aria-label="Удалить сессию"
+                className="shrink-0 text-xs text-neutral-400 hover:text-red-600"
+              >
+                ✕
+              </button>
             </div>
           ))}
           {sessions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет сессий</p>}

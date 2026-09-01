@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { usePrayerSettings } from '../hooks/usePrayerSettings'
 import { LocationSettings } from '../components/LocationSettings'
 import { QuickAddToken } from '../components/QuickAddToken'
+import { DataExport } from '../components/DataExport'
 import { Card } from '../components/Card'
 
 export default function Settings() {
@@ -15,6 +16,8 @@ export default function Settings() {
       {!loading && <LocationSettings settings={settings} onSave={saveLocation} />}
 
       <QuickAddToken />
+
+      <DataExport />
 
       <Card>
         <button

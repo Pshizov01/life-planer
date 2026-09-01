@@ -42,5 +42,26 @@ export function useFinance() {
     await reload()
   }
 
-  return { transactions, goals, loading, addTransaction, addGoal, updateGoalAmount }
+  async function deleteTransaction(id) {
+    const { error } = await supabase.from('finance_transactions').delete().eq('id', id)
+    if (error) throw error
+    await reload()
+  }
+
+  async function deleteGoal(goalId) {
+    const { error } = await supabase.from('finance_goals').delete().eq('id', goalId)
+    if (error) throw error
+    await reload()
+  }
+
+  return {
+    transactions,
+    goals,
+    loading,
+    addTransaction,
+    addGoal,
+    updateGoalAmount,
+    deleteTransaction,
+    deleteGoal,
+  }
 }

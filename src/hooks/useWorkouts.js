@@ -21,5 +21,11 @@ export function useWorkouts() {
     await reload()
   }
 
-  return { workouts, loading, addWorkout }
+  async function deleteWorkout(id) {
+    const { error } = await supabase.from('workouts').delete().eq('id', id)
+    if (error) throw error
+    await reload()
+  }
+
+  return { workouts, loading, addWorkout, deleteWorkout }
 }

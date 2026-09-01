@@ -14,7 +14,7 @@ function toNullableNumber(value) {
 }
 
 export default function Nutrition() {
-  const { logs, loading, saveDay } = useDailyLog()
+  const { logs, loading, saveDay, deleteDay } = useDailyLog()
   const [date, setDate] = useState(today())
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState(null)
@@ -56,8 +56,19 @@ export default function Nutrition() {
     }
   }
 
+  async function handleDelete() {
+    if (!window.confirm(`Удалить запись за ${date}?`)) return
+    try {
+      await deleteDay(date)
+      setError(null)
+    } catch {
+      setError(GENERIC_ERROR)
+    }
+  }
+
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
+  const hasEntryForDate = logs.some((l) => l.date === date)
   const weightSeries = logs.filter((l) => l.weight_kg != null)
   const sleepSeries = logs.filter((l) => l.sleep_hours != null)
 
@@ -151,6 +162,15 @@ export default function Nutrition() {
           >
             Сохранить
           </button>
+          {hasEntryForDate && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-red-50 hover:text-red-600"
+            >
+              Удалить запись
+            </button>
+          )}
         </form>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         <p className="mt-2 text-xs text-neutral-600">

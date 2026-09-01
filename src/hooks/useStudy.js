@@ -38,5 +38,17 @@ export function useStudy() {
     await reload()
   }
 
-  return { goals, sessions, loading, addGoal, updateGoalProgress, addSession }
+  async function deleteGoal(goalId) {
+    const { error } = await supabase.from('study_goals').delete().eq('id', goalId)
+    if (error) throw error
+    await reload()
+  }
+
+  async function deleteSession(sessionId) {
+    const { error } = await supabase.from('study_sessions').delete().eq('id', sessionId)
+    if (error) throw error
+    await reload()
+  }
+
+  return { goals, sessions, loading, addGoal, updateGoalProgress, addSession, deleteGoal, deleteSession }
 }
