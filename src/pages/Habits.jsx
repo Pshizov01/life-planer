@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { CheckCircle2 } from 'lucide-react'
 import { useHabits } from '../hooks/useHabits'
 import { habitStreak } from '../lib/calculations'
 import { PRAYER_NAMES, GENERIC_ERROR } from '../lib/constants'
 import { dayLabel } from '../lib/dates'
 import { Card } from '../components/Card'
+import { PageHeading } from '../components/PageHeading'
 
 export default function Habits() {
   const { habits, logs, dates, loading, toggleLog, addHabit, deleteHabit } = useHabits()
@@ -56,7 +58,7 @@ export default function Habits() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Привычки</h1>
+      <PageHeading icon={CheckCircle2} color="text-emerald-600">Привычки</PageHeading>
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card>

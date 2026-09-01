@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { Dumbbell } from 'lucide-react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { sumByWeek, groupByMonth } from '../lib/calculations'
 import { today, monthLabel } from '../lib/dates'
 import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
+import { PageHeading } from '../components/PageHeading'
 
 const emptyForm = { date: today(), type: '', duration_min: '', note: '' }
 
@@ -71,7 +73,7 @@ export default function Sport() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Спорт</h1>
+      <PageHeading icon={Dumbbell} color="text-teal-600">Спорт</PageHeading>
 
       <Card title="Длительность по неделям, мин">
         {weekly.length > 0 ? (

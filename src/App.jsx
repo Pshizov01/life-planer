@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { MoreHorizontal } from 'lucide-react'
 import { AuthProvider } from './components/AuthProvider.jsx'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx'
 import { useAuth } from './hooks/useAuth.js'
-import { supabase } from './lib/supabaseClient.js'
+import { SPHERES } from './lib/spheres.js'
 import Dashboard from './pages/Dashboard.jsx'
 import Sport from './pages/Sport.jsx'
 import Study from './pages/Study.jsx'
@@ -12,48 +13,43 @@ import Nutrition from './pages/Nutrition.jsx'
 import Finance from './pages/Finance.jsx'
 import Focus from './pages/Focus.jsx'
 import Projects from './pages/Projects.jsx'
+import Settings from './pages/Settings.jsx'
+import More from './pages/More.jsx'
 import Login from './pages/Login.jsx'
 
-const navItems = [
-  { to: '/', label: 'Обзор' },
-  { to: '/prayers', label: 'Намаз' },
-  { to: '/sport', label: 'Спорт' },
-  { to: '/study', label: 'Учёба' },
-  { to: '/habits', label: 'Привычки' },
-  { to: '/nutrition', label: 'Питание/Сон' },
-  { to: '/finance', label: 'Финансы' },
-  { to: '/focus', label: 'Фокус' },
-  { to: '/projects', label: 'Проекты' },
-]
+const primarySpheres = SPHERES.filter((s) => s.primary)
 
-function Nav() {
+function BottomNav() {
   const { session } = useAuth()
   if (!session) return null
 
   return (
-    <nav className="flex items-center justify-between gap-1 overflow-x-auto border-b border-neutral-200 bg-white px-4 py-2">
-      <div className="flex gap-1">
-        {navItems.map((item) => (
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)]">
+      {primarySpheres.map((sphere) => {
+        const Icon = sphere.icon
+        return (
           <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/'}
+            key={sphere.to}
+            to={sphere.to}
+            end={sphere.to === '/'}
             className={({ isActive }) =>
-              `whitespace-nowrap rounded-lg px-3 py-1.5 text-sm ${
-                isActive ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
-              }`
+              `flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] ${isActive ? sphere.color : 'text-neutral-400'}`
             }
           >
-            {item.label}
+            <Icon className="h-5 w-5" />
+            {sphere.label}
           </NavLink>
-        ))}
-      </div>
-      <button
-        onClick={() => supabase.auth.signOut()}
-        className="whitespace-nowrap rounded-lg px-3 py-1.5 text-sm text-neutral-500 hover:text-neutral-900"
+        )
+      })}
+      <NavLink
+        to="/more"
+        className={({ isActive }) =>
+          `flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] ${isActive ? 'text-neutral-700' : 'text-neutral-400'}`
+        }
       >
-        Выйти
-      </button>
+        <MoreHorizontal className="h-5 w-5" />
+        Ещё
+      </NavLink>
     </nav>
   )
 }
@@ -62,8 +58,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Nav />
-        <main className="p-4">
+        <main className="mx-auto max-w-2xl p-4 pb-24">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -75,8 +70,11 @@ export default function App() {
             <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
             <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
             <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
           </Routes>
         </main>
+        <BottomNav />
       </AuthProvider>
     </BrowserRouter>
   )

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BookOpen } from 'lucide-react'
 import { useStudy } from '../hooks/useStudy'
 import { sumByWeek } from '../lib/calculations'
 import { today } from '../lib/dates'
@@ -7,6 +8,7 @@ import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
 import { ClassSchedule } from '../components/ClassSchedule'
+import { PageHeading } from '../components/PageHeading'
 
 const emptyGoal = { title: '', target: '', unit: '' }
 const emptySession = { date: today(), subject: '', duration_min: '' }
@@ -61,7 +63,7 @@ export default function Study() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Учёба</h1>
+      <PageHeading icon={BookOpen} color="text-sky-600">Учёба</PageHeading>
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <ClassSchedule />

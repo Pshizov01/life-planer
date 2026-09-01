@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { FolderKanban } from 'lucide-react'
 import { useProjects } from '../hooks/useProjects'
 import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ProgressBar } from '../components/ProgressBar'
+import { PageHeading } from '../components/PageHeading'
 
 const emptyProject = { title: '', description: '' }
 
@@ -121,7 +123,7 @@ export default function Projects() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Проекты</h1>
+      <PageHeading icon={FolderKanban} color="text-indigo-600">Проекты</PageHeading>
 
       <Card title="Новый проект">
         <form onSubmit={handleAddProject} className="flex flex-wrap gap-2">

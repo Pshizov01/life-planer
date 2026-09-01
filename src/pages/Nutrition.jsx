@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { Utensils } from 'lucide-react'
 import { useDailyLog } from '../hooks/useDailyLog'
 import { today } from '../lib/dates'
 import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
+import { PageHeading } from '../components/PageHeading'
 
 const emptyForm = { weight_kg: '', meals_count: '', water_glasses: '', sleep_hours: '', plan_score: '' }
 
@@ -61,7 +63,7 @@ export default function Nutrition() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Питание / Сон</h1>
+      <PageHeading icon={Utensils} color="text-cyan-600">Питание / Сон</PageHeading>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Вес, кг">

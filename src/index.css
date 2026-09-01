@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --font-heading: "Lora", serif;
+}
+
 body {
   @apply bg-neutral-50 text-neutral-900;
+}
+
+h1 {
+  font-family: var(--font-heading);
 }

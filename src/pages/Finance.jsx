@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Wallet } from 'lucide-react'
 import { useFinance } from '../hooks/useFinance'
 import { sumByCategory } from '../lib/calculations'
 import { today } from '../lib/dates'
@@ -6,7 +7,7 @@ import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { ProgressBar } from '../components/ProgressBar'
-import { QuickAddToken } from '../components/QuickAddToken'
+import { PageHeading } from '../components/PageHeading'
 
 const emptyTx = { date: today(), type: 'expense', category: '', amount: '', note: '' }
 const emptyGoal = { title: '', target_amount: '', target_date: '' }
@@ -66,7 +67,7 @@ export default function Finance() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Финансы</h1>
+      <PageHeading icon={Wallet} color="text-orange-600">Финансы</PageHeading>
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -149,8 +150,6 @@ export default function Finance() {
           {transactions.length === 0 && <p className="py-4 text-center text-neutral-500">Пока нет транзакций</p>}
         </div>
       </Card>
-
-      <QuickAddToken />
 
       <Card title="Финансовые цели">
         <div className="flex flex-col gap-4">

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { Timer } from 'lucide-react'
 import { useFocusSessions } from '../hooks/useFocusSessions'
 import { sumByWeek } from '../lib/calculations'
 import { today } from '../lib/dates'
 import { GENERIC_ERROR } from '../lib/constants'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
+import { PageHeading } from '../components/PageHeading'
 
 const FOCUS_MIN = 25
 const BREAK_MIN = 5
@@ -68,7 +70,7 @@ export default function Focus() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Фокус</h1>
+      <PageHeading icon={Timer} color="text-violet-600">Фокус</PageHeading>
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Card>
