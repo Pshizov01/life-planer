@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Sport from './pages/Sport.jsx'
 import Study from './pages/Study.jsx'
 import Habits from './pages/Habits.jsx'
+import Tasks from './pages/Tasks.jsx'
 import Prayers from './pages/Prayers.jsx'
 import Nutrition from './pages/Nutrition.jsx'
 import Finance from './pages/Finance.jsx'
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="/sport" element={<ProtectedRoute><Sport /></ProtectedRoute>} />
             <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
             <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
+            <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
             <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
             <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
             <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />

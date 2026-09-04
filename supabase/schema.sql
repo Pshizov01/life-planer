@@ -47,6 +47,16 @@ create table class_schedule (
   created_at timestamptz not null default now()
 );
 
+-- ==================== Задачи на день (произвольный to-do, не повторяющийся) ====================
+create table daily_tasks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  date date not null,
+  title text not null,
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
 -- ==================== Привычки (включая намазы) ====================
 create table habits (
   id uuid primary key default gen_random_uuid(),
@@ -169,6 +179,7 @@ alter table project_tasks enable row level security;
 alter table class_schedule enable row level security;
 alter table prayer_settings enable row level security;
 alter table api_tokens enable row level security;
+alter table daily_tasks enable row level security;
 
 do $$
 declare
@@ -178,7 +189,7 @@ begin
     'workouts', 'study_goals', 'study_sessions', 'habits',
     'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
     'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings',
-    'api_tokens'
+    'api_tokens', 'daily_tasks'
   ]
   loop
     execute format(

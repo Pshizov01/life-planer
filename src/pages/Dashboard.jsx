@@ -1,11 +1,13 @@
-import { LayoutGrid, Landmark, Dumbbell, CheckCircle2, Utensils, BookOpen, Wallet } from 'lucide-react'
+import { LayoutGrid, Landmark, ListTodo, Dumbbell, CheckCircle2, Utensils, BookOpen, Wallet } from 'lucide-react'
 import { useHabits } from '../hooks/useHabits'
+import { useDailyTasks } from '../hooks/useDailyTasks'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useDailyLog } from '../hooks/useDailyLog'
 import { useStudy } from '../hooks/useStudy'
 import { useFinance } from '../hooks/useFinance'
 import { goalProgress } from '../lib/calculations'
 import { PRAYER_NAMES } from '../lib/constants'
+import { today } from '../lib/dates'
 import { Card } from '../components/Card'
 import { PageHeading } from '../components/PageHeading'
 
@@ -26,12 +28,14 @@ function daysAgo(n) {
 
 export default function Dashboard() {
   const { habits, logs: habitLogs, dates: weekDates, loading: habitsLoading } = useHabits()
+  const { tasks, loading: tasksLoading } = useDailyTasks()
   const { workouts, loading: workoutsLoading } = useWorkouts()
   const { logs: dailyLogs, loading: dailyLoading } = useDailyLog()
   const { goals: studyGoals, loading: studyLoading } = useStudy()
   const { transactions, loading: financeLoading } = useFinance()
 
-  const loading = habitsLoading || workoutsLoading || dailyLoading || studyLoading || financeLoading
+  const loading =
+    habitsLoading || tasksLoading || workoutsLoading || dailyLoading || studyLoading || financeLoading
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const last7 = daysAgo(6)
@@ -60,6 +64,9 @@ export default function Dashboard() {
       ? Math.round(studyGoals.reduce((sum, g) => sum + goalProgress(g.progress, g.target), 0) / studyGoals.length)
       : null
 
+  const todayTasks = tasks.filter((t) => t.date === today())
+  const todayTasksDone = todayTasks.filter((t) => t.done).length
+
   const thisMonth = new Date().toLocaleDateString('en-CA').slice(0, 7)
   const monthTx = transactions.filter((t) => t.date.startsWith(thisMonth))
   const monthBalance = monthTx.reduce((sum, t) => sum + (t.type === 'income' ? t.amount : -t.amount), 0)
@@ -77,6 +84,13 @@ export default function Dashboard() {
         <Card title={<CardTitle icon={Dumbbell} color="text-teal-600">Спорт</CardTitle>}>
           <p className="text-2xl font-semibold">{weekWorkouts.length}</p>
           <p className="text-xs text-neutral-500">тренировок за 7 дней ({weekWorkoutsMinutes} мин)</p>
+        </Card>
+
+        <Card title={<CardTitle icon={ListTodo} color="text-rose-600">Задачи</CardTitle>}>
+          <p className="text-2xl font-semibold">
+            {todayTasks.length > 0 ? `${todayTasksDone}/${todayTasks.length}` : '—'}
+          </p>
+          <p className="text-xs text-neutral-500">выполнено сегодня</p>
         </Card>
 
         <Card title={<CardTitle icon={CheckCircle2} color="text-emerald-600">Привычки</CardTitle>}>

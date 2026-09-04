@@ -4,6 +4,7 @@ import {
   Dumbbell,
   BookOpen,
   CheckCircle2,
+  ListTodo,
   Utensils,
   Wallet,
   Timer,
@@ -17,6 +18,7 @@ import {
 export const SPHERES = [
   { to: '/', label: 'Обзор', icon: LayoutGrid, color: 'text-neutral-700', primary: true },
   { to: '/prayers', label: 'Намаз', icon: Landmark, color: 'text-amber-700', primary: true },
+  { to: '/tasks', label: 'Задачи', icon: ListTodo, color: 'text-rose-600', primary: true },
   { to: '/habits', label: 'Привычки', icon: CheckCircle2, color: 'text-emerald-600', primary: true },
   { to: '/finance', label: 'Финансы', icon: Wallet, color: 'text-orange-600', primary: true },
   { to: '/sport', label: 'Спорт', icon: Dumbbell, color: 'text-teal-600' },
