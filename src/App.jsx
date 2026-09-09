@@ -6,10 +6,10 @@ import { useAuth } from './hooks/useAuth.js'
 import { SPHERES } from './lib/spheres.js'
 import Dashboard from './pages/Dashboard.jsx'
 import Sport from './pages/Sport.jsx'
-import Study from './pages/Study.jsx'
 import Habits from './pages/Habits.jsx'
 import Tasks from './pages/Tasks.jsx'
 import Prayers from './pages/Prayers.jsx'
+import Journal from './pages/Journal.jsx'
 import Nutrition from './pages/Nutrition.jsx'
 import Finance from './pages/Finance.jsx'
 import Focus from './pages/Focus.jsx'
@@ -65,9 +65,9 @@ export default function App() {
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/prayers" element={<ProtectedRoute><Prayers /></ProtectedRoute>} />
             <Route path="/sport" element={<ProtectedRoute><Sport /></ProtectedRoute>} />
-            <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
             <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+            <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
             <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
             <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
             <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />

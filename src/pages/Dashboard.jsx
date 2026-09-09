@@ -1,9 +1,9 @@
-import { LayoutGrid, Landmark, ListTodo, Dumbbell, CheckCircle2, Utensils, BookOpen, Wallet } from 'lucide-react'
+import { LayoutGrid, Landmark, ListTodo, Dumbbell, CheckCircle2, Moon, Utensils, Wallet } from 'lucide-react'
 import { useHabits } from '../hooks/useHabits'
 import { useDailyTasks } from '../hooks/useDailyTasks'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useDailyLog } from '../hooks/useDailyLog'
-import { useStudy } from '../hooks/useStudy'
+import { useJournal } from '../hooks/useJournal'
 import { useFinance } from '../hooks/useFinance'
 import { goalProgress } from '../lib/calculations'
 import { PRAYER_NAMES } from '../lib/constants'
@@ -31,11 +31,11 @@ export default function Dashboard() {
   const { tasks, loading: tasksLoading } = useDailyTasks()
   const { workouts, loading: workoutsLoading } = useWorkouts()
   const { logs: dailyLogs, loading: dailyLoading } = useDailyLog()
-  const { goals: studyGoals, loading: studyLoading } = useStudy()
+  const { entries: journalEntries, loading: journalLoading } = useJournal()
   const { transactions, loading: financeLoading } = useFinance()
 
   const loading =
-    habitsLoading || tasksLoading || workoutsLoading || dailyLoading || studyLoading || financeLoading
+    habitsLoading || tasksLoading || workoutsLoading || dailyLoading || journalLoading || financeLoading
   if (loading) return <p className="text-neutral-500">Загрузка…</p>
 
   const last7 = daysAgo(6)
@@ -59,13 +59,10 @@ export default function Dashboard() {
 
   const lastDaily = dailyLogs[dailyLogs.length - 1]
 
-  const avgStudyProgress =
-    studyGoals.length > 0
-      ? Math.round(studyGoals.reduce((sum, g) => sum + goalProgress(g.progress, g.target), 0) / studyGoals.length)
-      : null
-
   const todayTasks = tasks.filter((t) => t.date === today())
   const todayTasksDone = todayTasks.filter((t) => t.done).length
+
+  const todayJournaled = journalEntries.some((e) => e.date === today())
 
   const thisMonth = new Date().toLocaleDateString('en-CA').slice(0, 7)
   const monthTx = transactions.filter((t) => t.date.startsWith(thisMonth))
@@ -111,10 +108,10 @@ export default function Dashboard() {
           )}
         </Card>
 
-        <Card title={<CardTitle icon={BookOpen} color="text-sky-600">Учёба</CardTitle>}>
-          <p className="text-2xl font-semibold">{avgStudyProgress !== null ? `${avgStudyProgress}%` : '—'}</p>
+        <Card title={<CardTitle icon={Moon} color="text-purple-700">Дневник</CardTitle>}>
+          <p className="text-2xl font-semibold">{todayJournaled ? 'Записано' : '—'}</p>
           <p className="text-xs text-neutral-500">
-            {studyGoals.length > 0 ? `средний прогресс по ${studyGoals.length} целям` : 'Пока нет целей'}
+            {todayJournaled ? 'запись за сегодня есть' : 'сегодня ещё не писал'}
           </p>
         </Card>
 

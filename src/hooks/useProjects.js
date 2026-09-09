@@ -32,12 +32,12 @@ export function useProjects() {
     await reload()
   }
 
-  async function addTask(projectId, title) {
+  async function addTask(projectId, title, done = false) {
     const existing = tasks.filter((t) => t.project_id === projectId)
     const nextOrder = existing.length > 0 ? Math.max(...existing.map((t) => t.sort_order)) + 1 : 0
     const { error } = await supabase
       .from('project_tasks')
-      .insert({ project_id: projectId, title, sort_order: nextOrder })
+      .insert({ project_id: projectId, title, sort_order: nextOrder, done })
     if (error) throw error
     await reload()
   }

@@ -57,6 +57,17 @@ create table daily_tasks (
   created_at timestamptz not null default now()
 );
 
+-- ==================== Дневник мыслей (одна запись в день) ====================
+create table journal_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  date date not null,
+  content text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, date)
+);
+
 -- ==================== Привычки (включая намазы) ====================
 create table habits (
   id uuid primary key default gen_random_uuid(),
@@ -180,6 +191,7 @@ alter table class_schedule enable row level security;
 alter table prayer_settings enable row level security;
 alter table api_tokens enable row level security;
 alter table daily_tasks enable row level security;
+alter table journal_entries enable row level security;
 
 do $$
 declare
@@ -189,7 +201,7 @@ begin
     'workouts', 'study_goals', 'study_sessions', 'habits',
     'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
     'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings',
-    'api_tokens', 'daily_tasks'
+    'api_tokens', 'daily_tasks', 'journal_entries'
   ]
   loop
     execute format(

@@ -10,6 +10,7 @@ const emptyProject = { title: '', description: '' }
 
 function ProjectCard({ project, tasks, onAddTask, onToggleTask, onDelete }) {
   const [taskTitle, setTaskTitle] = useState('')
+  const [taskDone, setTaskDone] = useState(false)
   const [error, setError] = useState(null)
   const done = tasks.filter((t) => t.done).length
 
@@ -17,8 +18,9 @@ function ProjectCard({ project, tasks, onAddTask, onToggleTask, onDelete }) {
     e.preventDefault()
     if (!taskTitle.trim()) return
     try {
-      await onAddTask(project.id, taskTitle.trim())
+      await onAddTask(project.id, taskTitle.trim(), taskDone)
       setTaskTitle('')
+      setTaskDone(false)
       setError(null)
     } catch {
       setError(GENERIC_ERROR)
@@ -83,13 +85,22 @@ function ProjectCard({ project, tasks, onAddTask, onToggleTask, onDelete }) {
         {tasks.length === 0 && <p className="px-2 py-1 text-sm text-neutral-500">Пока нет задач</p>}
       </ul>
 
-      <form onSubmit={handleAddTask} className="mt-3 flex gap-2 border-t border-neutral-200 pt-3">
+      <form onSubmit={handleAddTask} className="mt-3 flex flex-wrap items-center gap-2 border-t border-neutral-200 pt-3">
         <input
           value={taskTitle}
           onChange={(e) => setTaskTitle(e.target.value)}
           placeholder="Новая задача"
-          className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-emerald-600"
+          className="min-w-[140px] flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-emerald-600"
         />
+        <label className="flex items-center gap-1.5 text-xs text-neutral-500">
+          <input
+            type="checkbox"
+            checked={taskDone}
+            onChange={(e) => setTaskDone(e.target.checked)}
+            className="h-4 w-4 rounded border-neutral-300 accent-emerald-600"
+          />
+          сразу выполнено
+        </label>
         <button
           type="submit"
           className="rounded-lg bg-neutral-100 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-200"
