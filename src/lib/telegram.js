@@ -33,3 +33,24 @@ export function initTelegramWebApp() {
     // ignore
   }
 }
+
+// Показывает текст на закреплённой снизу кнопке Telegram — удобно для
+// таймера помодоро: остаток времени виден, даже если проскроллить страницу.
+// Работает только пока мини-апп открыт (Telegram не даёт фоновым вкладкам
+// исполнять JS, когда приложение закрыто или экран телефона выключен).
+export function showMainButton(text) {
+  try {
+    window.Telegram?.WebApp?.MainButton?.setText(text)
+    window.Telegram?.WebApp?.MainButton?.show()
+  } catch {
+    // ignore
+  }
+}
+
+export function hideMainButton() {
+  try {
+    window.Telegram?.WebApp?.MainButton?.hide()
+  } catch {
+    // ignore
+  }
+}

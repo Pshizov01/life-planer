@@ -148,6 +148,18 @@ create table focus_sessions (
   created_at timestamptz not null default now()
 );
 
+-- Текущий запущенный таймер помодоро — одна строка на пользователя.
+-- Хранит момент окончания (а не "секунды осталось"), чтобы обратный отсчёт
+-- считался от реального времени и не сбивался, если вкладка/мини-апп были
+-- закрыты или телефон заблокирован: при следующем открытии остаток
+-- пересчитывается от ends_at, а не теряется.
+create table focus_timers (
+  user_id uuid primary key default auth.uid() references auth.users on delete cascade,
+  mode text not null check (mode in ('focus', 'break')),
+  ends_at timestamptz not null,
+  updated_at timestamptz not null default now()
+);
+
 -- ==================== Проекты ====================
 create table projects (
   id uuid primary key default gen_random_uuid(),
@@ -187,6 +199,7 @@ alter table daily_log enable row level security;
 alter table finance_transactions enable row level security;
 alter table finance_goals enable row level security;
 alter table focus_sessions enable row level security;
+alter table focus_timers enable row level security;
 alter table projects enable row level security;
 alter table project_tasks enable row level security;
 alter table class_schedule enable row level security;
@@ -202,7 +215,7 @@ begin
   foreach t in array array[
     'workouts', 'study_goals', 'study_sessions', 'habits',
     'habit_logs', 'daily_log', 'finance_transactions', 'finance_goals',
-    'focus_sessions', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings',
+    'focus_sessions', 'focus_timers', 'projects', 'project_tasks', 'class_schedule', 'prayer_settings',
     'api_tokens', 'daily_tasks', 'journal_entries'
   ]
   loop
