@@ -39,10 +39,12 @@ create table study_sessions (
 create table class_schedule (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  week int not null default 1 check (week in (1, 2)), -- чередование недель: 1 / 2
   day_of_week int not null check (day_of_week between 1 and 7), -- 1=Пн ... 7=Вс
   start_time time not null,
   end_time time,
   subject text not null,
+  teacher text,
   room text,
   created_at timestamptz not null default now()
 );

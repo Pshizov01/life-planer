@@ -9,6 +9,7 @@ import {
   Wallet,
   Timer,
   FolderKanban,
+  BookOpen,
   Settings as SettingsIcon,
 } from 'lucide-react'
 
@@ -26,6 +27,7 @@ export const SPHERES = [
   { to: '/nutrition', label: 'Питание/Сон', icon: Utensils, color: 'text-cyan-600' },
   { to: '/focus', label: 'Фокус', icon: Timer, color: 'text-violet-600' },
   { to: '/projects', label: 'Проекты', icon: FolderKanban, color: 'text-indigo-600' },
+  { to: '/study', label: 'Учёба', icon: BookOpen, color: 'text-sky-600' },
 ]
 
 export const SETTINGS_SPHERE = { to: '/settings', label: 'Настройки', icon: SettingsIcon, color: 'text-neutral-500' }

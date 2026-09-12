@@ -14,6 +14,7 @@ import Nutrition from './pages/Nutrition.jsx'
 import Finance from './pages/Finance.jsx'
 import Focus from './pages/Focus.jsx'
 import Projects from './pages/Projects.jsx'
+import Study from './pages/Study.jsx'
 import Settings from './pages/Settings.jsx'
 import More from './pages/More.jsx'
 import Login from './pages/Login.jsx'
@@ -72,6 +73,7 @@ export default function App() {
             <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
             <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
             <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
           </Routes>
