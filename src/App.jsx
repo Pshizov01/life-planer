@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { MoreHorizontal } from 'lucide-react'
 import { AuthProvider } from './components/AuthProvider.jsx'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx'
+import { Sidebar } from './components/Sidebar.jsx'
 import { useAuth } from './hooks/useAuth.js'
 import { SPHERES } from './lib/spheres.js'
 import Dashboard from './pages/Dashboard.jsx'
@@ -26,7 +27,7 @@ function BottomNav() {
   if (!session) return null
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
       {primarySpheres.map((sphere) => {
         const Icon = sphere.icon
         return (
@@ -60,24 +61,27 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <main className="mx-auto max-w-2xl p-4 pb-24">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/prayers" element={<ProtectedRoute><Prayers /></ProtectedRoute>} />
-            <Route path="/sport" element={<ProtectedRoute><Sport /></ProtectedRoute>} />
-            <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-            <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-            <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
-            <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
-            <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
-          </Routes>
-        </main>
+        <Sidebar />
+        <div className="lg:pl-56">
+          <main className="mx-auto max-w-2xl p-4 pb-24 lg:max-w-4xl lg:pb-8">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/prayers" element={<ProtectedRoute><Prayers /></ProtectedRoute>} />
+              <Route path="/sport" element={<ProtectedRoute><Sport /></ProtectedRoute>} />
+              <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
+              <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+              <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
+              <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
+              <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+              <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+              <Route path="/study" element={<ProtectedRoute><Study /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
+            </Routes>
+          </main>
+        </div>
         <BottomNav />
       </AuthProvider>
     </BrowserRouter>
