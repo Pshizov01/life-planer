@@ -54,3 +54,14 @@ export function hideMainButton() {
     // ignore
   }
 }
+
+// Вибрация телефона через Telegram — самый надёжный способ привлечь
+// внимание внутри мини-аппа, не зависит от системных разрешений на
+// уведомления и работает даже при выключенном звуке.
+export function notifySuccess() {
+  try {
+    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success')
+  } catch {
+    // ignore
+  }
+}

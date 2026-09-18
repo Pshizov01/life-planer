@@ -5,7 +5,7 @@ import { useFocusTimer } from '../hooks/useFocusTimer'
 import { sumByWeek } from '../lib/calculations'
 import { today } from '../lib/dates'
 import { GENERIC_ERROR } from '../lib/constants'
-import { showMainButton, hideMainButton } from '../lib/telegram'
+import { showMainButton, hideMainButton, notifySuccess } from '../lib/telegram'
 import { Card } from '../components/Card'
 import { ChartWrapper } from '../components/ChartWrapper'
 import { PageHeading } from '../components/PageHeading'
@@ -26,10 +26,85 @@ export default function Focus() {
   const [pausedSeconds, setPausedSeconds] = useState(FOCUS_MIN * 60)
   const [now, setNow] = useState(() => Date.now())
   const [error, setError] = useState(null)
+  const [banner, setBanner] = useState(null)
   const completingRef = useRef(false)
+  const audioCtxRef = useRef(null)
 
   const running = Boolean(timer)
   const displayMode = timer ? timer.mode : mode
+
+  // AudioContext можно запускать только по прямому действию пользователя
+  // (иначе браузер его глушит) — "прогреваем" по первому тапу на странице,
+  // чтобы звук сработал даже если таймер уже шёл до открытия страницы.
+  function ensureAudioContext() {
+    if (!audioCtxRef.current) {
+      const Ctx = window.AudioContext || window.webkitAudioContext
+      if (!Ctx) return null
+      audioCtxRef.current = new Ctx()
+    }
+    if (audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {})
+    }
+    return audioCtxRef.current
+  }
+
+  useEffect(() => {
+    function prime() {
+      ensureAudioContext()
+      document.removeEventListener('pointerdown', prime)
+    }
+    document.addEventListener('pointerdown', prime)
+    return () => document.removeEventListener('pointerdown', prime)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function playBeep() {
+    try {
+      const ctx = ensureAudioContext()
+      if (!ctx) return
+      const startAt = ctx.currentTime
+      ;[0, 0.24].forEach((offset) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = 880
+        gain.gain.setValueAtTime(0.0001, startAt + offset)
+        gain.gain.exponentialRampToValueAtTime(0.3, startAt + offset + 0.02)
+        gain.gain.exponentialRampToValueAtTime(0.0001, startAt + offset + 0.2)
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start(startAt + offset)
+        osc.stop(startAt + offset + 0.24)
+      })
+    } catch {
+      // ignore
+    }
+  }
+
+  function requestNotificationPermission() {
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        Notification.requestPermission()
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  function notifyCompletion(finishedMode) {
+    playBeep()
+    notifySuccess()
+    const text =
+      finishedMode === 'focus' ? 'Помодоро завершён! Время для перерыва ☕' : 'Перерыв закончен — снова за дело 🎯'
+    setBanner(text)
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('Life Planner', { body: text })
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   // Держим локальный режим синхронным с активным серверным таймером —
   // например, если помодоро был запущен на другом устройстве.
@@ -65,6 +140,7 @@ export default function Focus() {
       try {
         if (timer.mode === 'focus') await logSession(FOCUS_MIN)
         await clear()
+        notifyCompletion(timer.mode)
         const nextMode = timer.mode === 'focus' ? 'break' : 'focus'
         setMode(nextMode)
         setPausedSeconds(nextMode === 'focus' ? FOCUS_MIN * 60 : BREAK_MIN * 60)
@@ -106,6 +182,9 @@ export default function Focus() {
         setPausedSeconds(remaining)
         await clear()
       } else {
+        ensureAudioContext()
+        requestNotificationPermission()
+        setBanner(null)
         const endsAt = new Date(Date.now() + pausedSeconds * 1000).toISOString()
         await start(mode, endsAt)
       }
@@ -119,6 +198,7 @@ export default function Focus() {
     try {
       await clear()
       setPausedSeconds(mode === 'focus' ? FOCUS_MIN * 60 : BREAK_MIN * 60)
+      setBanner(null)
       setError(null)
     } catch {
       setError(GENERIC_ERROR)
@@ -131,6 +211,7 @@ export default function Focus() {
       await clear()
       setMode(nextMode)
       setPausedSeconds(nextMode === 'focus' ? FOCUS_MIN * 60 : BREAK_MIN * 60)
+      setBanner(null)
       setError(null)
     } catch {
       setError(GENERIC_ERROR)
@@ -146,6 +227,19 @@ export default function Focus() {
     <div className="flex flex-col gap-4">
       <PageHeading icon={Timer} color="text-violet-600">Фокус</PageHeading>
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      {banner && (
+        <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+          {banner}
+          <button
+            onClick={() => setBanner(null)}
+            aria-label="Скрыть уведомление"
+            className="shrink-0 text-emerald-600 hover:text-emerald-800"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <Card>
         <div className="flex flex-col items-center gap-4 py-4">
