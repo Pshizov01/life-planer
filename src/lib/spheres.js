@@ -10,6 +10,7 @@ import {
   Timer,
   FolderKanban,
   BookOpen,
+  Swords,
   Settings as SettingsIcon,
 } from 'lucide-react'
 
@@ -18,10 +19,11 @@ import {
 // Tailwind точно включил их в сборку.
 export const SPHERES = [
   { to: '/', label: 'Обзор', icon: LayoutGrid, color: 'text-neutral-700', primary: true },
+  { to: '/day', label: 'День', icon: Swords, color: 'text-fuchsia-600', primary: true },
   { to: '/prayers', label: 'Намаз', icon: Landmark, color: 'text-amber-700', primary: true },
-  { to: '/tasks', label: 'Задачи', icon: ListTodo, color: 'text-rose-600', primary: true },
-  { to: '/habits', label: 'Привычки', icon: CheckCircle2, color: 'text-emerald-600', primary: true },
   { to: '/finance', label: 'Финансы', icon: Wallet, color: 'text-orange-600', primary: true },
+  { to: '/tasks', label: 'Задачи', icon: ListTodo, color: 'text-rose-600' },
+  { to: '/habits', label: 'Привычки', icon: CheckCircle2, color: 'text-emerald-600' },
   { to: '/sport', label: 'Спорт', icon: Dumbbell, color: 'text-teal-600' },
   { to: '/journal', label: 'Дневник', icon: Moon, color: 'text-purple-700' },
   { to: '/nutrition', label: 'Питание/Сон', icon: Utensils, color: 'text-cyan-600' },

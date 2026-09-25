@@ -2,11 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { mondayOf } from '../lib/calculations'
 
-// Текущая календарная неделя, Пн -> Вс (по возрастанию). Пересчитывается
+// Календарная неделя Пн -> Вс. По умолчанию текущая — пересчитывается
 // каждый рендер от реальной даты, поэтому в понедельник сама сдвигается
-// на следующую неделю — без отдельного планировщика.
-function currentWeekDates() {
-  const monday = mondayOf(new Date().toLocaleDateString('en-CA'))
+// на следующую неделю без отдельного планировщика.
+export function weekDates(monday) {
   const d = new Date(`${monday}T00:00:00`)
   const dates = []
   for (let i = 0; i < 7; i++) {
@@ -16,22 +15,23 @@ function currentWeekDates() {
   return dates
 }
 
-export function useHabits() {
+export function useHabits(weekStart) {
   const [habits, setHabits] = useState([])
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
-  const dates = currentWeekDates()
+  const dates = weekDates(weekStart ?? mondayOf(new Date().toLocaleDateString('en-CA')))
   const fromDate = dates[0]
+  const toDate = dates[6]
 
   const reload = useCallback(async () => {
     const [{ data: habitsData }, { data: logsData }] = await Promise.all([
       supabase.from('habits').select('*').order('sort_order', { ascending: true }),
-      supabase.from('habit_logs').select('*').gte('date', fromDate),
+      supabase.from('habit_logs').select('*').gte('date', fromDate).lte('date', toDate),
     ])
     setHabits(habitsData ?? [])
     setLogs(logsData ?? [])
     setLoading(false)
-  }, [fromDate])
+  }, [fromDate, toDate])
 
   useEffect(() => {
     reload()

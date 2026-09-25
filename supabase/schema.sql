@@ -113,6 +113,9 @@ create table daily_log (
   water_glasses int check (water_glasses >= 0),
   plan_score int check (plan_score between 1 and 5),
   sleep_hours numeric check (sleep_hours >= 0),
+  energy int check (energy between 1 and 5), -- итог дня в разделе «День»
+  mood int check (mood between 1 and 5),
+  lesson text, -- «урок дня» — одна мысль, вынесенная из дня
   created_at timestamptz not null default now(),
   unique (user_id, date)
 );
