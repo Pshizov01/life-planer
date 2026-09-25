@@ -6,7 +6,6 @@ import { Sidebar } from './components/Sidebar.jsx'
 import { useAuth } from './hooks/useAuth.js'
 import { SPHERES } from './lib/spheres.js'
 import Dashboard from './pages/Dashboard.jsx'
-import Day from './pages/Day.jsx'
 import Sport from './pages/Sport.jsx'
 import Habits from './pages/Habits.jsx'
 import Tasks from './pages/Tasks.jsx'
@@ -68,7 +67,7 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/day" element={<ProtectedRoute><Day /></ProtectedRoute>} />              <Route path="/prayers" element={<ProtectedRoute><Prayers /></ProtectedRoute>} />
+              <Route path="/prayers" element={<ProtectedRoute><Prayers /></ProtectedRoute>} />
               <Route path="/sport" element={<ProtectedRoute><Sport /></ProtectedRoute>} />
               <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
               <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
